@@ -156,6 +156,12 @@ set(STUB_SOURCES
     Stub/DiabloUI/selhero.cpp
     Stub/DiabloUI/title.cpp
 
+    3rdParty/libsmackerdec/src/BitReader.cpp
+    3rdParty/libsmackerdec/src/FileStream.cpp
+    3rdParty/libsmackerdec/src/HuffmanVLC.cpp
+    3rdParty/libsmackerdec/src/LogError.cpp
+    3rdParty/libsmackerdec/src/SmackerDecoder.cpp
+
     3rdParty/StormLib/src/FileStream.cpp
     3rdParty/StormLib/src/SBaseCommon.cpp
     3rdParty/StormLib/src/SBaseFileTable.cpp
