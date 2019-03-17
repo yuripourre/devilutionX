@@ -1903,6 +1903,27 @@ void __fastcall game_loop(BOOL bStartup)
 }
 // 679660: using guessed type char gbMaxPlayers;
 
+void __fastcall keyboardExpension()
+{
+	//WALK VIA KEYBOARD
+	if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
+		plr[myplr].walkpath[0] = WALK_SE;
+	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP))
+		plr[myplr].walkpath[0] = WALK_NE;
+	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN))
+		plr[myplr].walkpath[0] = WALK_SW;
+	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP))
+		plr[myplr].walkpath[0] = WALK_NW;
+	else if (GetAsyncKeyState(VK_UP) & 0x8000)
+		plr[myplr].walkpath[0] = WALK_N;
+	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		plr[myplr].walkpath[0] = WALK_E;
+	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		plr[myplr].walkpath[0] = WALK_S;
+	else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		plr[myplr].walkpath[0] = WALK_W;
+}
+
 void __cdecl game_logic()
 {
 	if (PauseMode != 2) {
@@ -1941,6 +1962,8 @@ void __cdecl game_logic()
 			CheckQuests();
 			drawpanflag |= 1u;
 			pfile_update(0);
+
+			keyboardExpension();
 		}
 	}
 }
