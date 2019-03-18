@@ -72,6 +72,7 @@ void __cdecl diablo_color_cyc_logic();
 bool checkNearbyObjs(int x, int y);
 void __fastcall checkItemsNearby();
 void __fastcall keyboardExpension();
+void __fastcall checkMonstersNearby();
 
 /* data */
 

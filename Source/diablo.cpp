@@ -1906,8 +1906,8 @@ void __fastcall game_loop(BOOL bStartup)
 // JAKE: MY FUNCS
 bool checkNearbyObjs(int x, int y)
 {
-	int diff_x = plr[myplr]._px - x;
-	int diff_y = plr[myplr]._py - y;
+	int diff_x = abs(plr[myplr]._px - x);
+	int diff_y = abs(plr[myplr]._py - y);
 
 	if (diff_x <= 1 && diff_y <= 1)
 		return true;
@@ -1917,16 +1917,39 @@ bool checkNearbyObjs(int x, int y)
 void __fastcall checkItemsNearby()
 {
 	for (int i = 0; i < MAXITEMS; i++) {
-		if (checkNearbyObjs(item[i]._ix, item[i]._iy))
+		if (checkNearbyObjs(item[i]._ix, item[i]._iy)) {
 			AutoGetItem(myplr, i);
+			return;
+		}
+	}
+	for (int i = 0; i < MAXOBJECTS; i++) {
+		if (checkNearbyObjs(object[i]._ox, object[i]._oy)) {
+			OperateChest(myplr, i, 0);
+			return;
+		}
+	}
+}
+
+void __fastcall checkMonstersNearby()
+{
+	for (int i = 0; i < MAXMONSTERS; i++) {
+		if (checkNearbyObjs(monster[i]._mx, monster[i]._my) && monster[i]._mhitpoints > 0) {
+			int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
+			StartAttack(myplr, d);
+			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
+			//NetSendCmdString(1 << myplr, tempstr);
+			return; // just attack 1 monster
+		}
 	}
 }
 
 void __fastcall keyboardExpension()
 {
-	if (GetAsyncKeyState(VK_SPACE)) {
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+		checkMonstersNearby();
+	else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
 		checkItemsNearby();
-	} else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
+	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
 		plr[myplr].walkpath[0] = WALK_SE;
 	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP))
 		plr[myplr].walkpath[0] = WALK_NE;
