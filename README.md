@@ -7,6 +7,7 @@ Adding keyboard movements and controller support.
 ## To-Do
 - Make sure keys don't affect menus.
 - Add spell cast key.
+- Make talk to NPC on spacebar press in town.
 - When inventory is open, make cursor lock onto inventory and equipment grid.
     - Spacebar should emulate mouse clicks when inventory is open.
 - When character levels up, and char info window is open, lock cursor onto [+] buttons.
