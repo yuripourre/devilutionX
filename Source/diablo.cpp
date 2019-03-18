@@ -1453,8 +1453,8 @@ void __fastcall PressChar(int vkey)
 						StartQuestlog();
 				}
 				return;
-			case 'S':
-			case 's':
+			case 'H':
+			case 'h':
 				if (!stextflag) {
 					invflag = 0;
 					if (spselflag)
@@ -1509,10 +1509,10 @@ void __fastcall PressChar(int vkey)
 					plr[myplr]._pSplLvl[plr[myplr]._pSpell]++;
 				}
 				return;
-			case 'D':
+			case 'O':
 				PrintDebugPlayer(1);
 				return;
-			case 'd':
+			case 'o':
 				PrintDebugPlayer(0);
 				return;
 			case 'e':
@@ -1933,7 +1933,12 @@ void __fastcall checkItemsNearby()
 void __fastcall checkMonstersNearby()
 {
 	for (int i = 0; i < MAXMONSTERS; i++) {
-		if (checkNearbyObjs(monster[i]._mx, monster[i]._my) && monster[i]._mhitpoints > 0) {
+		bool cN = false;
+		if (plr[myplr]._pwtype == WT_MELEE)
+			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 1);
+		else if (plr[myplr]._pwtype == WT_RANGED)
+			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 7);
+		if (cN && monster[i]._mhitpoints > 0) {
 			int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
 			StartAttack(myplr, d);
 			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
@@ -1945,25 +1950,27 @@ void __fastcall checkMonstersNearby()
 
 void __fastcall keyboardExpension()
 {
+	if (automapflag || stextflag || questlog || helpflag)
+		return;
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 		checkMonstersNearby();
 	else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
 		checkItemsNearby();
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
+	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53))
 		plr[myplr].walkpath[0] = WALK_SE;
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP))
+	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x44))
 		plr[myplr].walkpath[0] = WALK_NE;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN))
+	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x41) && GetAsyncKeyState(0x53))
 		plr[myplr].walkpath[0] = WALK_SW;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP))
+	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x41))
 		plr[myplr].walkpath[0] = WALK_NW;
-	else if (GetAsyncKeyState(VK_UP) & 0x8000)
+	else if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57))
 		plr[myplr].walkpath[0] = WALK_N;
-	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	else if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState(0x44))
 		plr[myplr].walkpath[0] = WALK_E;
-	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	else if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x53))
 		plr[myplr].walkpath[0] = WALK_S;
-	else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	else if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(0x41))
 		plr[myplr].walkpath[0] = WALK_W;
 }
 

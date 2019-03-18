@@ -15,7 +15,7 @@ const char gszHelpText[] = {
 	"Tab:   Display Auto-map|"
 	"Space: Hide all info screens, attack nearby monsters|"
 	"Enter: Pickup nearby gold and items. Open nearby chests|"
-	"S: Open Speedbook|"
+	"H: Open Speedbook|"
 	"B: Open Spellbook|"
 	"I: Open Inventory screen|"
 	"C: Open Character screen|"
