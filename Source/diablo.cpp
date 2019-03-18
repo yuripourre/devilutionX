@@ -1903,10 +1903,30 @@ void __fastcall game_loop(BOOL bStartup)
 }
 // 679660: using guessed type char gbMaxPlayers;
 
+// JAKE: MY FUNCS
+bool checkNearbyObjs(int x, int y)
+{
+	int diff_x = plr[myplr]._px - x;
+	int diff_y = plr[myplr]._py - y;
+
+	if (diff_x <= 1 && diff_y <= 1)
+		return true;
+	return false;
+}
+
+void __fastcall checkItemsNearby()
+{
+	for (int i = 0; i < MAXITEMS; i++) {
+		if (checkNearbyObjs(item[i]._ix, item[i]._iy))
+			AutoGetItem(myplr, i);
+	}
+}
+
 void __fastcall keyboardExpension()
 {
-	//WALK VIA KEYBOARD
-	if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
+	if (GetAsyncKeyState(VK_SPACE)) {
+		checkItemsNearby();
+	} else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN))
 		plr[myplr].walkpath[0] = WALK_SE;
 	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP))
 		plr[myplr].walkpath[0] = WALK_NE;

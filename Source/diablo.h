@@ -68,6 +68,11 @@ void __cdecl game_logic();
 void __fastcall timeout_cursor(BOOL bTimeout);
 void __cdecl diablo_color_cyc_logic();
 
+// JAKE: MY FUNCS
+bool checkNearbyObjs(int x, int y);
+void __fastcall checkItemsNearby();
+void __fastcall keyboardExpension();
+
 /* data */
 
 extern int diablo_inf; // weak
