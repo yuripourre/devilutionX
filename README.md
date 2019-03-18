@@ -3,6 +3,7 @@ Adding keyboard movements and controller support.
 ## Current New Keyboard Functions
 - Spacebar - Attack nearby enemies.
 - Enter - Pickup gold, potions & equipment from ground and open chests that are nearby.
+- Arrow Keys - Move character in that direction. Has diagonals programmed.
 
 ## To-Do
 - Make sure keys don't affect menus.
