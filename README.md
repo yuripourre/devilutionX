@@ -14,6 +14,7 @@ Adding keyboard movements and controller support.
 - Make talk to NPC on spacebar press.
     - _Note:_ Sometimes monsters might talk like towners ```CanTalkToMonst(pcursmonst)```
 	- _Note2:_ Check if nearby towner via ```towner[i]._tx``` and ```towner[i]._ty```
+	- _Note3:_ Maybe use function ```void __fastcall TalkToTowner``` ?
 - When inventory is open, make cursor lock onto inventory and equipment grid.
     - Spacebar should emulate mouse clicks when inventory is open.
 - When character levels up, and char info window is open, lock cursor onto [+] buttons.
