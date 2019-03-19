@@ -11,7 +11,6 @@ Adding keyboard movements and controller support.
 ## To-Do
 - Make sure keys don't affect menus.
     - _Note:_ Did several menu checks already. More testing is needed.
-- Show item description and NPC names when nearby.
 - Add spell cast key. (maybe X key?)
     - _Note:_ Check ```void __fastcall CastSpell```
 - When inventory is open, make cursor lock onto inventory and equipment grid.
