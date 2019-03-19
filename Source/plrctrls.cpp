@@ -18,18 +18,19 @@ void __fastcall checkItemsNearby(bool interact)
 		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1)) {
 			pcursitem = i;
 			if (interact) {
-				//AutoGetItem(myplr, i);
-				MakePlrPath(myplr, item[i]._ix, item[i]._iy, FALSE); // TEST
+				LeftMouseCmd(false);
 			}
 			return;
 		}
 	}
 	for (int i = 0; i < MAXOBJECTS; i++) {
 		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1)) {
+			int ot = object[i]._otype;
+			if (ot == OBJ_CANDLE1 || ot == OBJ_CANDLE2 || ot == OBJ_CANDLEO || ot == OBJ_L1LIGHT || ot == OBJ_TORCHL || ot == OBJ_TORCHR)
+				continue;
 			pcursobj = i;
 			if (interact) {
-				//OperateChest(myplr, i, 0);
-				MakePlrPath(myplr, object[i]._ox, object[i]._oy, FALSE); // TEST
+				LeftMouseCmd(false);
 			}
 			return;
 		}
@@ -58,9 +59,7 @@ void __fastcall checkMonstersNearby(bool attack)
 			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
 		if (cN && monster[i]._mhitpoints > 0) {
 			if (attack) {
-				//int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
-				//StartAttack(myplr, d);
-				MakePlrPath(myplr, monster[i]._mx, monster[i]._my, FALSE); // TEST
+				LeftMouseCmd(false);
 			}
 			pcursmonst = i;
 			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
@@ -76,26 +75,38 @@ void __fastcall keyboardExpension()
 		return;
 	if (GetAsyncKeyState(VK_SHIFT))
 		return;
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+	if (GetAsyncKeyState(VK_SPACE)) {
+		SetCursorPos(-1, -1);
 		checkTownersNearby(true);
 		checkMonstersNearby(true);
-	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
+	} else if (GetAsyncKeyState(VK_RETURN)) {
+		SetCursorPos(-1, -1);
 		checkItemsNearby(true);
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53))
+	}
+	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53)) {
 		plr[myplr].walkpath[0] = WALK_SE;
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x44))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x44)) {
 		plr[myplr].walkpath[0] = WALK_NE;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x41) && GetAsyncKeyState(0x53))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x41) && GetAsyncKeyState(0x53)) {
 		plr[myplr].walkpath[0] = WALK_SW;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x41))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x41)) {
 		plr[myplr].walkpath[0] = WALK_NW;
-	else if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57)) {
 		plr[myplr].walkpath[0] = WALK_N;
-	else if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState(0x44))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState(0x44)) {
 		plr[myplr].walkpath[0] = WALK_E;
-	else if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x53))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x53)) {
 		plr[myplr].walkpath[0] = WALK_S;
-	else if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(0x41))
+		SetCursorPos(-1, -1);
+	} else if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(0x41)) {
 		plr[myplr].walkpath[0] = WALK_W;
-	ShowCursor(FALSE); // TEST
+		SetCursorPos(-1, -1);
+	}
+	//ShowCursor(FALSE); // doesnt really hide the cursor
 }

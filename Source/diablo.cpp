@@ -677,7 +677,6 @@ LRESULT CALLBACK GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_MOUSEMOVE:
-		ShowCursor(TRUE); // JAKE: TEST
 		MouseX = LOWORD(lParam);
 		MouseY = HIWORD(lParam);
 		gmenu_on_mouse_move(LOWORD(lParam));

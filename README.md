@@ -20,5 +20,3 @@ Adding keyboard movements and controller support.
     - Spacebar should emulate mouse clicks when this happens.
 - Add XInput.
     - _Note:_ When you click the S key, it opens the spell window same as PS1 version.
-- [BUG] When barrels are opened by enter key they explode.
-- [BUG] When doors are opened by enter key they explode with gold and items.
