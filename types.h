@@ -133,6 +133,7 @@ extern "C" {
 #include "Source/trigs.h"
 #include "Source/wave.h"
 #include "Source/render.h" // linked last, likely .s/.asm
+#include "Source/plrctrls.h"
 #ifdef __cplusplus
 }
 #endif

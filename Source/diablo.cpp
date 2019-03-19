@@ -1171,7 +1171,7 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollUp();
 							} else if (automapflag) {
-								if (GetAsyncKeyState(VK_SHIFT))
+								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [1] no move when u move
 									AutomapUp();
 							}
 							return;
@@ -1183,7 +1183,7 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollDown();
 							} else if (automapflag) {
-								if (GetAsyncKeyState(VK_SHIFT))
+								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [2] no move when u move
 									AutomapDown();
 							}
 							return;
@@ -1197,13 +1197,13 @@ void __fastcall PressKey(int vkey)
 							return;
 						case VK_LEFT:
 							if (automapflag && !talkflag) {
-								if (GetAsyncKeyState(VK_SHIFT))
+								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [3] no move when u move
 									AutomapLeft();
 							}
 							return;
 						case VK_RIGHT:
 							if (automapflag && !talkflag) {
-								if (GetAsyncKeyState(VK_SHIFT))
+								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [4] no move when u move
 									AutomapRight();
 							}
 							return;
@@ -1459,7 +1459,7 @@ void __fastcall PressChar(int vkey)
 						StartQuestlog();
 				}
 				return;
-			case 'H':
+			case 'H': // JAKE: Changed, used to be 'S' and 's'
 			case 'h':
 				if (!stextflag) {
 					invflag = 0;
@@ -1515,10 +1515,10 @@ void __fastcall PressChar(int vkey)
 					plr[myplr]._pSplLvl[plr[myplr]._pSpell]++;
 				}
 				return;
-			case 'O':
+			case 'O': // JAKE: Changed, used to be 'D'
 				PrintDebugPlayer(1);
 				return;
-			case 'o':
+			case 'o': // JAKE: Changed, used to be 'd'
 				PrintDebugPlayer(0);
 				return;
 			case 'e':
@@ -1909,100 +1909,6 @@ void __fastcall game_loop(BOOL bStartup)
 }
 // 679660: using guessed type char gbMaxPlayers;
 
-// JAKE: MY FUNCS
-bool checkNearbyObjs(int x, int y, int diff)
-{
-	int diff_x = abs(plr[myplr]._px - x);
-	int diff_y = abs(plr[myplr]._py - y);
-
-	if (diff_x <= diff && diff_y <= diff)
-		return true;
-	return false;
-}
-
-void __fastcall checkItemsNearby(bool interact)
-{
-	for (int i = 0; i < MAXITEMS; i++) {
-		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1)) {
-			pcursitem = i;
-			if (interact)
-				AutoGetItem(myplr, i);
-			return;
-		}
-	}
-	for (int i = 0; i < MAXOBJECTS; i++) {
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1)) {
-			pcursobj = i;
-			if (interact)
-				OperateChest(myplr, i, 0);
-			return;
-		}
-	}
-}
-
-void __fastcall checkTownersNearby(bool interact)
-{
-	for (int i = 0; i < 16; i++) {
-		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 1)) {
-			pcursmonst = i;
-			if (interact)
-				TalkToTowner(myplr, i);
-			return;
-		}
-	}
-}
-
-void __fastcall checkMonstersNearby(bool attack)
-{
-	for (int i = 0; i < MAXMONSTERS; i++) {
-		bool cN = false;
-		if (plr[myplr]._pwtype == WT_MELEE)
-			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 1);
-		else if (plr[myplr]._pwtype == WT_RANGED)
-			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
-		if (cN && monster[i]._mhitpoints > 0) {
-			if (attack) {
-				int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
-				StartAttack(myplr, d);
-			}
-			pcursmonst = i;
-			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
-			//NetSendCmdString(1 << myplr, tempstr);
-			return; // just attack 1 monster
-		}
-	}
-}
-
-void __fastcall keyboardExpension()
-{
-	if (stextflag || questlog || helpflag || invflag || talkflag || qtextflag)
-		return;
-	if (GetAsyncKeyState(VK_SHIFT))
-		return;
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
-		checkTownersNearby(true);
-		checkMonstersNearby(true);
-	}
-	else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
-		checkItemsNearby(true);
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53))
-		plr[myplr].walkpath[0] = WALK_SE;
-	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x44))
-		plr[myplr].walkpath[0] = WALK_NE;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x41) && GetAsyncKeyState(0x53))
-		plr[myplr].walkpath[0] = WALK_SW;
-	else if (GetAsyncKeyState(VK_LEFT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x41))
-		plr[myplr].walkpath[0] = WALK_NW;
-	else if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57))
-		plr[myplr].walkpath[0] = WALK_N;
-	else if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState(0x44))
-		plr[myplr].walkpath[0] = WALK_E;
-	else if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x53))
-		plr[myplr].walkpath[0] = WALK_S;
-	else if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(0x41))
-		plr[myplr].walkpath[0] = WALK_W;
-}
-
 void __cdecl game_logic()
 {
 	if (PauseMode != 2) {
@@ -2042,10 +1948,12 @@ void __cdecl game_logic()
 			drawpanflag |= 1u;
 			pfile_update(0);
 
+			// JAKE: PLRCTRLS
 			checkTownersNearby(false);
 			checkMonstersNearby(false);
 			checkItemsNearby(false);
 			keyboardExpension();
+			//
 		}
 	}
 }

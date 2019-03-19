@@ -176,6 +176,7 @@
     <ClCompile Include="Source\path.cpp" />
     <ClCompile Include="Source\pfile.cpp" />
     <ClCompile Include="Source\player.cpp" />
+    <ClCompile Include="Source\plrctrls.cpp" />
     <ClCompile Include="Source\plrmsg.cpp" />
     <ClCompile Include="Source\portal.cpp" />
     <ClCompile Include="Source\quests.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="Source\path.h" />
     <ClInclude Include="Source\pfile.h" />
     <ClInclude Include="Source\player.h" />
+    <ClInclude Include="Source\plrctrls.h" />
     <ClInclude Include="Source\plrmsg.h" />
     <ClInclude Include="Source\portal.h" />
     <ClInclude Include="Source\quests.h" />

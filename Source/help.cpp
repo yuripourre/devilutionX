@@ -13,9 +13,9 @@ const char gszHelpText[] = {
 	"F1:    Open Help Screen|"
 	"Esc:   Display Main Menu|"
 	"Tab:   Display Auto-map|"
-	"Space: Hide all info screens, attack nearby monsters, talk to nearby towns people|"
-	"Enter: Pickup nearby gold and items. Open nearby chests|"
-	"H: Open Speedbook|"
+	"Space: Hide all info screens, attack nearby monsters, talk to nearby towns people|" // JAKE: Changed
+	"Enter: Pickup nearby gold and items. Open nearby chests|" // JAKE: Changed
+	"H: Open Speedbook|" // JAKE: Changed, used to be S key
 	"B: Open Spellbook|"
 	"I: Open Inventory screen|"
 	"C: Open Character screen|"
