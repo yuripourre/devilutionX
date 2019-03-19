@@ -17,16 +17,20 @@ void __fastcall checkItemsNearby(bool interact)
 	for (int i = 0; i < MAXITEMS; i++) {
 		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1)) {
 			pcursitem = i;
-			if (interact)
-				AutoGetItem(myplr, i);
+			if (interact) {
+				//AutoGetItem(myplr, i);
+				MakePlrPath(myplr, item[i]._ix, item[i]._iy, FALSE); // TEST
+			}
 			return;
 		}
 	}
 	for (int i = 0; i < MAXOBJECTS; i++) {
 		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1)) {
 			pcursobj = i;
-			if (interact)
-				OperateChest(myplr, i, 0);
+			if (interact) {
+				//OperateChest(myplr, i, 0);
+				MakePlrPath(myplr, object[i]._ox, object[i]._oy, FALSE); // TEST
+			}
 			return;
 		}
 	}
@@ -54,8 +58,9 @@ void __fastcall checkMonstersNearby(bool attack)
 			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
 		if (cN && monster[i]._mhitpoints > 0) {
 			if (attack) {
-				int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
-				StartAttack(myplr, d);
+				//int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
+				//StartAttack(myplr, d);
+				MakePlrPath(myplr, monster[i]._mx, monster[i]._my, FALSE); // TEST
 			}
 			pcursmonst = i;
 			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
@@ -92,4 +97,5 @@ void __fastcall keyboardExpension()
 		plr[myplr].walkpath[0] = WALK_S;
 	else if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(0x41))
 		plr[myplr].walkpath[0] = WALK_W;
+	ShowCursor(FALSE); // TEST
 }
