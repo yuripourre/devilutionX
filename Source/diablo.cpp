@@ -1920,43 +1920,52 @@ bool checkNearbyObjs(int x, int y, int diff)
 	return false;
 }
 
-void __fastcall checkItemsNearby()
+void __fastcall checkItemsNearby(bool interact)
 {
 	for (int i = 0; i < MAXITEMS; i++) {
 		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1)) {
-			AutoGetItem(myplr, i);
+			pcursitem = i;
+			if (interact)
+				AutoGetItem(myplr, i);
 			return;
 		}
 	}
 	for (int i = 0; i < MAXOBJECTS; i++) {
 		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1)) {
-			OperateChest(myplr, i, 0);
+			pcursobj = i;
+			if (interact)
+				OperateChest(myplr, i, 0);
 			return;
 		}
 	}
 }
 
-void __fastcall checkTownersNearby()
+void __fastcall checkTownersNearby(bool interact)
 {
 	for (int i = 0; i < 16; i++) {
 		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 1)) {
-			TalkToTowner(myplr, i);
+			pcursmonst = i;
+			if (interact)
+				TalkToTowner(myplr, i);
 			return;
 		}
 	}
 }
 
-void __fastcall checkMonstersNearby()
+void __fastcall checkMonstersNearby(bool attack)
 {
 	for (int i = 0; i < MAXMONSTERS; i++) {
 		bool cN = false;
 		if (plr[myplr]._pwtype == WT_MELEE)
 			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 1);
 		else if (plr[myplr]._pwtype == WT_RANGED)
-			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 7);
+			cN = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
 		if (cN && monster[i]._mhitpoints > 0) {
-			int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
-			StartAttack(myplr, d);
+			if (attack) {
+				int d = GetDirection(plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
+				StartAttack(myplr, d);
+			}
+			pcursmonst = i;
 			//sprintf(tempstr, "ATTACKING NEARBY MONSTER! PX:%i PY:%i MX:%i MY:%i", plr[myplr]._px, plr[myplr]._py, monster[i]._mx, monster[i]._my);
 			//NetSendCmdString(1 << myplr, tempstr);
 			return; // just attack 1 monster
@@ -1971,11 +1980,11 @@ void __fastcall keyboardExpension()
 	if (GetAsyncKeyState(VK_SHIFT))
 		return;
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
-		checkTownersNearby();
-		checkMonstersNearby();
+		checkTownersNearby(true);
+		checkMonstersNearby(true);
 	}
 	else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
-		checkItemsNearby();
+		checkItemsNearby(true);
 	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53))
 		plr[myplr].walkpath[0] = WALK_SE;
 	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_UP) || GetAsyncKeyState(0x57) && GetAsyncKeyState(0x44))
@@ -2033,6 +2042,9 @@ void __cdecl game_logic()
 			drawpanflag |= 1u;
 			pfile_update(0);
 
+			checkTownersNearby(false);
+			checkMonstersNearby(false);
+			checkItemsNearby(false);
 			keyboardExpension();
 		}
 	}
