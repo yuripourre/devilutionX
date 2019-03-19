@@ -1,12 +1,13 @@
 Adding keyboard movements and controller support.
 
-## Current New Keyboard Functions
+## New Features
 - Spacebar - Attack nearby enemies, talk to towns people and merchants.
 - Enter - Pickup gold, potions & equipment from ground and open chests that are nearby.
 - Arrow Keys and WASD Keys - Move character in that direction. Has diagonals programmed.
 - Moved Debug Player key to O.
 - Moved Speed Spell key to H.
 - Automap only moves when you hold down shift.
+- Towns people, items and objects show information when nearby.
 
 ## To-Do
 - Make sure keys don't affect menus.
@@ -19,3 +20,5 @@ Adding keyboard movements and controller support.
     - Spacebar should emulate mouse clicks when this happens.
 - Add XInput.
     - _Note:_ When you click the S key, it opens the spell window same as PS1 version.
+- [BUG] When barrels are opened by enter key they explode.
+- [BUG] When doors are opened by enter key they explode with gold and items.
