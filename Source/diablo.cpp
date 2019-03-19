@@ -1171,7 +1171,8 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollUp();
 							} else if (automapflag) {
-								AutomapUp();
+								if (GetAsyncKeyState(VK_SHIFT))
+									AutomapUp();
 							}
 							return;
 						case VK_DOWN:
@@ -1182,7 +1183,8 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollDown();
 							} else if (automapflag) {
-								AutomapDown();
+								if (GetAsyncKeyState(VK_SHIFT))
+									AutomapDown();
 							}
 							return;
 						case VK_PRIOR:
@@ -1194,12 +1196,16 @@ void __fastcall PressKey(int vkey)
 								STextNext();
 							return;
 						case VK_LEFT:
-							if (automapflag && !talkflag)
-								AutomapLeft();
+							if (automapflag && !talkflag) {
+								if (GetAsyncKeyState(VK_SHIFT))
+									AutomapLeft();
+							}
 							return;
 						case VK_RIGHT:
-							if (automapflag && !talkflag)
-								AutomapRight();
+							if (automapflag && !talkflag) {
+								if (GetAsyncKeyState(VK_SHIFT))
+									AutomapRight();
+							}
 							return;
 						case VK_TAB:
 							DoAutoMap();
@@ -1904,12 +1910,12 @@ void __fastcall game_loop(BOOL bStartup)
 // 679660: using guessed type char gbMaxPlayers;
 
 // JAKE: MY FUNCS
-bool checkNearbyObjs(int x, int y)
+bool checkNearbyObjs(int x, int y, int diff)
 {
 	int diff_x = abs(plr[myplr]._px - x);
 	int diff_y = abs(plr[myplr]._py - y);
 
-	if (diff_x <= 1 && diff_y <= 1)
+	if (diff_x <= diff && diff_y <= diff)
 		return true;
 	return false;
 }
@@ -1917,14 +1923,24 @@ bool checkNearbyObjs(int x, int y)
 void __fastcall checkItemsNearby()
 {
 	for (int i = 0; i < MAXITEMS; i++) {
-		if (checkNearbyObjs(item[i]._ix, item[i]._iy)) {
+		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1)) {
 			AutoGetItem(myplr, i);
 			return;
 		}
 	}
 	for (int i = 0; i < MAXOBJECTS; i++) {
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy)) {
+		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1)) {
 			OperateChest(myplr, i, 0);
+			return;
+		}
+	}
+}
+
+void __fastcall checkTownersNearby()
+{
+	for (int i = 0; i < 16; i++) {
+		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 1)) {
+			TalkToTowner(myplr, i);
 			return;
 		}
 	}
@@ -1950,10 +1966,14 @@ void __fastcall checkMonstersNearby()
 
 void __fastcall keyboardExpension()
 {
-	if (automapflag || stextflag || questlog || helpflag)
+	if (stextflag || questlog || helpflag || invflag || talkflag || qtextflag)
 		return;
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+	if (GetAsyncKeyState(VK_SHIFT))
+		return;
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
+		checkTownersNearby();
 		checkMonstersNearby();
+	}
 	else if (GetAsyncKeyState(VK_RETURN) & 0x8000)
 		checkItemsNearby();
 	else if (GetAsyncKeyState(VK_RIGHT) && GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(0x44) && GetAsyncKeyState(0x53))

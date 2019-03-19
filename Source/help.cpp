@@ -13,7 +13,7 @@ const char gszHelpText[] = {
 	"F1:    Open Help Screen|"
 	"Esc:   Display Main Menu|"
 	"Tab:   Display Auto-map|"
-	"Space: Hide all info screens, attack nearby monsters|"
+	"Space: Hide all info screens, attack nearby monsters, talk to nearby towns people|"
 	"Enter: Pickup nearby gold and items. Open nearby chests|"
 	"H: Open Speedbook|"
 	"B: Open Spellbook|"
