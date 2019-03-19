@@ -1,21 +1,19 @@
 Adding keyboard movements and controller support.
 
 ## Current New Keyboard Functions
-- Spacebar - Attack nearby enemies.
+- Spacebar - Attack nearby enemies, talk to towns people and merchants.
 - Enter - Pickup gold, potions & equipment from ground and open chests that are nearby.
 - Arrow Keys and WASD Keys - Move character in that direction. Has diagonals programmed.
 - Moved Debug Player key to O.
 - Moved Speed Spell key to H.
+- Automap only moves when you hold down shift.
 
 ## To-Do
 - Make sure keys don't affect menus.
     - _Note:_ Did several menu checks already. More testing is needed.
+- Show item description and NPC names when nearby.
 - Add spell cast key. (maybe X key?)
     - _Note:_ Check ```void __fastcall CastSpell```
-- Make talk to NPC on spacebar press.
-    - _Note:_ Sometimes monsters might talk like towners ```CanTalkToMonst(pcursmonst)```
-	- _Note2:_ Check if nearby towner via ```towner[i]._tx``` and ```towner[i]._ty```
-	- _Note3:_ Maybe use function ```void __fastcall TalkToTowner``` ?
 - When inventory is open, make cursor lock onto inventory and equipment grid.
     - Spacebar should emulate mouse clicks when inventory is open.
 - When character levels up, and char info window is open, lock cursor onto [+] buttons.
