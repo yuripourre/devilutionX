@@ -13,7 +13,7 @@ extern const InvXY InvRect[73]; // wasn't made public, so I'll add this here fro
 
 #define INV_TOP 240;
 #define INV_LEFT 350;
-#define INV_HEIGHT 590;
+#define INV_HEIGHT 320;
 #define DISPLAY_HEIGHT 360;
 #define DISPLAY_WIDTH 640;
 

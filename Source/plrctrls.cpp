@@ -104,13 +104,13 @@ void invMove(int key)
 		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // right hand to chest
 			x = InvRect[SLOTXY_CHEST_LAST].X;
 			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // right ring to left ring
-			x = InvRect[SLOTXY_RING_LEFT].X;
+		} else if (x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // right ring to left ring
+			x = InvRect[SLOTXY_RING_LEFT].X + 5;
 			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
-		} else if (x == InvRect[SLOTXY_AMULET].X && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // amulet to head
+		} else if (x == (InvRect[SLOTXY_AMULET].X + 5) && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // amulet to head
 			x = InvRect[SLOTXY_HEAD_LAST].X;
 			y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
-		} else if (x < dw && x >= inv_left && y >= inv_top) {
+		} else if (x < dw && x > inv_left && y >= inv_top) {
 			x = x - 29;
 		}
 	} else if (key == VK_RIGHT) {
@@ -120,11 +120,11 @@ void invMove(int key)
 		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // left hand to chest
 			x = InvRect[SLOTXY_CHEST_LAST].X;
 			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // left ring to right ring
-			x = InvRect[SLOTXY_RING_RIGHT].X;
+		} else if (x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // left ring to right ring
+			x = InvRect[SLOTXY_RING_RIGHT].X + 5;
 			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
 		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // head to amulet
-			x = InvRect[SLOTXY_AMULET].X;
+			x = InvRect[SLOTXY_AMULET].X + 5;
 			y = InvRect[SLOTXY_AMULET].Y - 5;
 		} else if (x < dw && x >= inv_left && y >= inv_top) {
 			x = x + 29;
@@ -136,24 +136,24 @@ void invMove(int key)
 			if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // if at chest, go to head
 				x = InvRect[SLOTXY_HEAD_LAST].X;
 				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
-			} else if (x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // if at right ring, go to right hand
+			} else if (x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // if at right ring, go to right hand
 				x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
 				y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
-			} else if (x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // if at left ring, go to left hand
-				x = InvRect[SLOTXY_HAND_LEFT_LAST].X - 5;
+			} else if (x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // if at left ring, go to left hand
+				x = InvRect[SLOTXY_HAND_LEFT_LAST].X;
 				y = InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5;
 			} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to head
 				x = InvRect[SLOTXY_HEAD_LAST].X;
 				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
 			} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to amulet
-				x = InvRect[SLOTXY_AMULET].X;
+				x = InvRect[SLOTXY_AMULET].X + 5;
 				y = InvRect[SLOTXY_AMULET].Y - 5;
 			} else if (y == inv_top) { // general inventory, go to chest
 				if (x >= inv_left && x < 422) { // left side goes up to left ring
-					x = InvRect[SLOTXY_RING_LEFT].X;
+					x = InvRect[SLOTXY_RING_LEFT].X + 5;
 					y = InvRect[SLOTXY_RING_LEFT].Y - 5;
 				} else if (x > 567 && x < dw) { // right side goes up to right ring
-					x = InvRect[SLOTXY_RING_RIGHT].X;
+					x = InvRect[SLOTXY_RING_RIGHT].X + 5;
 					y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
 				} else { // center goes to chest
 					x = InvRect[SLOTXY_CHEST_LAST].X;
@@ -162,22 +162,22 @@ void invMove(int key)
 			}
 		}
 	} else if (key == VK_DOWN) {
-		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5) ||
-			x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5) ||
-			x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // go back to general inventory
+		if ((x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) ||
+			(x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) ||
+			(x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5))) { // go back to general inventory
 			x = 350;
 			y = 240;
-		} else if (x == InvRect[SLOTXY_AMULET].X && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // if at amulet, go to right hand
+		} else if ((x == InvRect[SLOTXY_AMULET].X + 5) && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // if at amulet, go to right hand
 			x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
 			y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
 		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // if at head, go to chest
 			x = InvRect[SLOTXY_CHEST_LAST].X;
 			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
 		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to left ring
-			x = InvRect[SLOTXY_RING_LEFT].X;
+			x = InvRect[SLOTXY_RING_LEFT].X + 5;
 			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
 		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to right ring
-			x = InvRect[SLOTXY_RING_RIGHT].X;
+			x = InvRect[SLOTXY_RING_RIGHT].X + 5;
 			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
 		} else if (y >= inv_top && y < inv_height) { // general inventory area
 			y = y + 29;
