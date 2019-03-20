@@ -1,5 +1,11 @@
 Adding keyboard movements and controller support.
 
+## Roadmap
+
+- Part 1 : Impliment functions and map them to keyboard controls.
+- Part 2 : Integrate XInput for controller support, and impliment our functions.
+- Part 3 (OPTIONAL) : Local co-op for controllers. Up to 4 players.
+
 ## New Features
 
 - Spacebar - Attack nearby enemies, talk to towns people and merchants.

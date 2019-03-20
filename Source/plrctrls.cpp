@@ -2,14 +2,19 @@
 
 // JAKE: My functions for movement and interaction via keyboard/controller
 bool newCurHidden = false;
+int dh = DISPLAY_HEIGHT;
+int dw = DISPLAY_WIDTH;
+int inv_top = INV_TOP;
+int inv_left = INV_LEFT;
+int inv_height = INV_HEIGHT;
 
-// 0 = not near, >0 = distance near plr
+// 0 = not near, >0 = distance related player 1 coordinates
 int checkNearbyObjs(int x, int y, int diff)
 {
 	int diff_x = abs(plr[myplr]._px - x);
 	int diff_y = abs(plr[myplr]._py - y);
 
-	if (diff_x <= diff && diff_y <= diff) 
+	if (diff_x <= diff && diff_y <= diff)
 		return diff_x;
 	return 0;
 }
@@ -52,7 +57,7 @@ void __fastcall checkTownersNearby(bool interact)
 
 bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 {
-	int closest = 0; // monster ID who is closest
+	int closest = 0;      // monster ID who is closest
 	int objDistLast = 99; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
 		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0)
@@ -63,7 +68,7 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 			objDistLast = objDist;
 		}
 	}
-	if (closest > 0) // did we find a monster? 
+	if (closest > 0) // did we find a monster?
 		pcursmonst = closest;
 	else
 		return false;
@@ -75,53 +80,160 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 	return false;
 }
 
+// hide the cursor when we start walking via keyboard/controller
 void HideCursor()
 {
-	SetCursorPos(320, 180);
+	SetCursorPos((dh/2), (dw/2));
 	FreeCursor();
 	newCurHidden = true;
 }
 
+// move the cursor around in our inventory
+// if mouse coords are at SLOTXY_CHEST_LAST, consider this center of equipment
+// small inventory squares are 29x29 (roughly)
+void invMove(int key)
+{
+	if (!invflag)
+		return;
+	int x = MouseX;
+	int y = MouseY;
+	if (key == VK_LEFT) {
+		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // chest to left hand
+			x = InvRect[SLOTXY_HAND_LEFT_LAST].X;
+			y = InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // right hand to chest
+			x = InvRect[SLOTXY_CHEST_LAST].X;
+			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // right ring to left ring
+			x = InvRect[SLOTXY_RING_LEFT].X;
+			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
+		} else if (x == InvRect[SLOTXY_AMULET].X && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // amulet to head
+			x = InvRect[SLOTXY_HEAD_LAST].X;
+			y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
+		} else if (x < dw && x >= inv_left && y >= inv_top) {
+			x = x - 29;
+		}
+	} else if (key == VK_RIGHT) {
+		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // chest to right hand
+			x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
+			y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // left hand to chest
+			x = InvRect[SLOTXY_CHEST_LAST].X;
+			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // left ring to right ring
+			x = InvRect[SLOTXY_RING_RIGHT].X;
+			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
+		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // head to amulet
+			x = InvRect[SLOTXY_AMULET].X;
+			y = InvRect[SLOTXY_AMULET].Y - 5;
+		} else if (x < dw && x >= inv_left && y >= inv_top) {
+			x = x + 29;
+		}
+	} else if (key == VK_UP) {
+		if (y > inv_top && x >= inv_left) {
+			y = y - 29;
+		} else { // go into equipment spaces
+			if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // if at chest, go to head
+				x = InvRect[SLOTXY_HEAD_LAST].X;
+				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
+			} else if (x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // if at right ring, go to right hand
+				x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
+				y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
+			} else if (x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // if at left ring, go to left hand
+				x = InvRect[SLOTXY_HAND_LEFT_LAST].X - 5;
+				y = InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5;
+			} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to head
+				x = InvRect[SLOTXY_HEAD_LAST].X;
+				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
+			} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to amulet
+				x = InvRect[SLOTXY_AMULET].X;
+				y = InvRect[SLOTXY_AMULET].Y - 5;
+			} else if (y == inv_top) { // general inventory, go to chest
+				if (x >= inv_left && x < 422) { // left side goes up to left ring
+					x = InvRect[SLOTXY_RING_LEFT].X;
+					y = InvRect[SLOTXY_RING_LEFT].Y - 5;
+				} else if (x > 567 && x < dw) { // right side goes up to right ring
+					x = InvRect[SLOTXY_RING_RIGHT].X;
+					y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
+				} else { // center goes to chest
+					x = InvRect[SLOTXY_CHEST_LAST].X;
+					y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
+				}
+			}
+		}
+	} else if (key == VK_DOWN) {
+		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5) ||
+			x == InvRect[SLOTXY_RING_LEFT].X && y == (InvRect[SLOTXY_RING_LEFT].Y - 5) ||
+			x == InvRect[SLOTXY_RING_RIGHT].X && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // go back to general inventory
+			x = 350;
+			y = 240;
+		} else if (x == InvRect[SLOTXY_AMULET].X && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // if at amulet, go to right hand
+			x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
+			y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // if at head, go to chest
+			x = InvRect[SLOTXY_CHEST_LAST].X;
+			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
+		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to left ring
+			x = InvRect[SLOTXY_RING_LEFT].X;
+			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
+		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to right ring
+			x = InvRect[SLOTXY_RING_RIGHT].X;
+			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
+		} else if (y >= inv_top && y < inv_height) { // general inventory area
+			y = y + 29;
+		}
+	}
+	SetCursorPos(x, y);
+}
+
+// walk in the direction specified
+void walkInDir(int dir)
+{
+	if (invflag) // don't walk if inventory window is open
+		return;
+	HideCursor();
+	plr[myplr].walkpath[0] = dir;
+}
+
 void __fastcall keyboardExpension()
 {
-	if (stextflag || questlog || helpflag || invflag || talkflag || qtextflag)
+	if (stextflag || questlog || helpflag || talkflag || qtextflag)
 		return;
 	if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
 		return;
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000) {
-		HideCursor();
-		checkTownersNearby(true);
-		checkMonstersNearby(true, false);
-	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) {
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000) { // similar to X button on PS1 ccontroller. Talk to towners, click on inv items, attack.
+		if (invflag) {
+			LeftMouseCmd(false);
+		} else {
+			HideCursor();
+			checkTownersNearby(true);
+			checkMonstersNearby(true, false);
+		}
+	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
 		HideCursor();
 		checkItemsNearby(true);
-	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key
+	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
 		checkMonstersNearby(false, true);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_SE;
+		walkInDir(WALK_SE);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x44) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_NE;
+		walkInDir(WALK_NE);
 	} else if (GetAsyncKeyState(VK_LEFT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_SW;
+		walkInDir(WALK_SW);
 	} else if (GetAsyncKeyState(VK_LEFT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x41) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_NW;
+		walkInDir(WALK_NW);
 	} else if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_N;
+		invMove(VK_UP);
+		walkInDir(WALK_N);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_E;
+		invMove(VK_RIGHT);
+		walkInDir(WALK_E);
 	} else if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_S;
+		invMove(VK_DOWN);
+		walkInDir(WALK_S);
 	} else if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) {
-		HideCursor();
-		plr[myplr].walkpath[0] = WALK_W;
+		invMove(VK_LEFT);
+		walkInDir(WALK_W);
 	}
-	//ShowCursor(FALSE); // doesnt really hide the cursor
 }

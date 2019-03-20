@@ -1175,7 +1175,7 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollUp();
 							} else if (automapflag) {
-								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [1] no move when u move
+								if (GetAsyncKeyState(VK_SHIFT) & 0x8000) // JAKE: [1] no move when u move
 									AutomapUp();
 							}
 							return;
@@ -1187,7 +1187,7 @@ void __fastcall PressKey(int vkey)
 							} else if (helpflag) {
 								HelpScrollDown();
 							} else if (automapflag) {
-								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [2] no move when u move
+								if (GetAsyncKeyState(VK_SHIFT) & 0x8000) // JAKE: [2] no move when u move
 									AutomapDown();
 							}
 							return;
@@ -1201,13 +1201,13 @@ void __fastcall PressKey(int vkey)
 							return;
 						case VK_LEFT:
 							if (automapflag && !talkflag) {
-								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [3] no move when u move
+								if (GetAsyncKeyState(VK_SHIFT) & 0x8000) // JAKE: [3] no move when u move
 									AutomapLeft();
 							}
 							return;
 						case VK_RIGHT:
 							if (automapflag && !talkflag) {
-								if (GetAsyncKeyState(VK_SHIFT)) // JAKE: [4] no move when u move
+								if (GetAsyncKeyState(VK_SHIFT) & 0x8000) // JAKE: [4] no move when u move
 									AutomapRight();
 							}
 							return;
@@ -1431,6 +1431,14 @@ void __fastcall PressChar(int vkey)
 				sbookflag = 0;
 				v4 = invflag == 0;
 				invflag = invflag == 0;
+				// JAKE: Show cursor if inventory window open, set cursor to inv slot 1
+				if (!newCurHidden) {
+					InitCursor();
+					newCurHidden = false;
+				}
+				SetCursorPos(350, 240); // inv cells are 29x29
+				return; // don't do the other cursor move stuff
+				//
 				if (!v4 || chrflag) {
 				LABEL_24:
 					if (MouseX < 480) {
