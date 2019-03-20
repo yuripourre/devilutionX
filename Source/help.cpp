@@ -22,6 +22,7 @@ const char gszHelpText[] = {
 	"Q: Open Quest log|"
 	"F: Reduce screen brightness|"
 	"G: Increase screen brightness|"
+	"X: Cast Spell|" // Jake: Added new key
 	"Z: Zoom Game Screen|"
 	"+ / -: Zoom Automap|"
 	"1 - 8: Use Belt item|"

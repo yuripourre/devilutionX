@@ -426,9 +426,9 @@ void __fastcall diablo_parse_flags(char *args)
 			case 'w': // rest of the cheats, some only in town
 				debug_mode_key_w = 1;
 				break;
-			case 'x':
-				fullscreen = FALSE;
-				break;
+			//case 'x': // JAKE: Removed for spell casting
+			//	fullscreen = FALSE;
+			//	break;
 			default:
 				break;
 			}
