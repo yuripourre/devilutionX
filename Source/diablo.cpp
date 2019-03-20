@@ -677,6 +677,10 @@ LRESULT CALLBACK GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_MOUSEMOVE:
+		if (newCurHidden) {
+			InitCursor();
+			newCurHidden = false;
+		}
 		MouseX = LOWORD(lParam);
 		MouseY = HIWORD(lParam);
 		gmenu_on_mouse_move(LOWORD(lParam));
@@ -1949,9 +1953,11 @@ void __cdecl game_logic()
 			pfile_update(0);
 
 			// JAKE: PLRCTRLS
-			checkTownersNearby(false);
-			checkMonstersNearby(false);
-			checkItemsNearby(false);
+			// check for monsters first, then towners or objs.
+			if (!checkMonstersNearby(false, false)) {
+				checkTownersNearby(false);
+				checkItemsNearby(false);
+			}
 			keyboardExpension();
 			//
 		}
