@@ -16,37 +16,48 @@ int checkNearbyObjs(int x, int y, int diff)
 
 	if (diff_x <= diff && diff_y <= diff)
 		return diff_x;
-	return 0;
+	return -1;
 }
 
 void __fastcall checkItemsNearby(bool interact)
 {
 	for (int i = 0; i < MAXITEMS; i++) {
-		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1) != 0) {
+		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1) != -1 && item[i]._iSelFlag > 0) {
 			pcursitem = i;
+			//if (newCurHidden) {
+				if (dItem[item[i]._ix][item[i]._iy] <= 0)
+					continue;
+				//SetCursorPos(item[i]._ix, item[i]._iy);
+			//}
+			//sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
+			//NetSendCmdString(1 << myplr, tempstr);
 			if (interact) {
 				LeftMouseCmd(false);
 			}
-			break;
+			return; // item nearby, don't find objects
 		}
 	}
+	if (newCurHidden)
+		pcursitem = -1;
+	//sprintf(tempstr, "SCANNING FOR OBJECTS");
+	//NetSendCmdString(1 << myplr, tempstr);
 	for (int i = 0; i < MAXOBJECTS; i++) {
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1) != 0) {
-			if (object[i]._oSelFlag == 0) // already opened chests, torches, etc.
-				continue;
+		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1) != -1 && object[i]._oSelFlag > 0) {
 			pcursobj = i;
 			if (interact) {
 				LeftMouseCmd(false);
 			}
-			break;
+			return;
 		}
 	}
+	if (newCurHidden)
+		pcursobj = -1;
 }
 
 void __fastcall checkTownersNearby(bool interact)
 {
 	for (int i = 0; i < 16; i++) {
-		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 1) != 0) {
+		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 2) != -1) {
 			pcursmonst = i;
 			if (interact)
 				TalkToTowner(myplr, i);
@@ -60,23 +71,39 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 	int closest = 0;      // monster ID who is closest
 	int objDistLast = 99; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
-		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0)
+		int d_monster = dMonster[monster[i]._mx][monster[i]._my + 1];
+		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // is monster alive and not hiding
 			continue;
-		int objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
-		if (objDist > 0 && objDist < objDistLast) {
-			closest = i;
-			objDistLast = objDist;
-		}
+		//if (d_monster && dFlags[monster[i]._mx][monster[i]._my + 1] & DFLAG_LIT) { // is monster visible
+		//	if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
+				int objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
+				if (objDist > -1 && objDist < objDistLast) {
+					closest = i;
+					objDistLast = objDist;
+				}
+		//	}
+		//}
 	}
-	if (closest > 0) // did we find a monster?
+	if (closest > 0 && (attack || castspell)) { // did we find a monster, and want to attack it?
 		pcursmonst = closest;
-	else
+		//sprintf(tempstr, "NEARBY MONSTER WITH HP:%i", monster[closest]._mhitpoints);
+		//NetSendCmdString(1 << myplr, tempstr);
+	} else if (closest > 0){ // found monster, but we don't want to attack it
+		return true;
+	} else {
+		pcursmonst = -1;
 		return false;
+	}
 	if (attack) {
 		LeftMouseCmd(false);
+		return true;
 	} else if (castspell) {
 		RightMouseDown();
+		return true;
+	} else {
+		return true;
 	}
+	pcursmonst = -1;
 	return false;
 }
 
@@ -197,25 +224,49 @@ void walkInDir(int dir)
 	plr[myplr].walkpath[0] = dir;
 }
 
+// clicks outside of game
+/*void realClick(int x, int y)
+{
+	INPUT input;
+	input.type = INPUT_MOUSE;
+	input.mi.dx = x;
+	input.mi.dy = y;
+	input.mi.dwFlags = (MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP);
+	input.mi.mouseData = 0;
+	input.mi.dwExtraInfo = NULL;
+	input.mi.time = 0;
+	SendInput(1, &input, sizeof(INPUT));
+}*/
+
 void __fastcall keyboardExpension()
 {
+	static DWORD opentimer;
+	DWORD ticks;
+	ticks = GetTickCount();
+
 	if (stextflag || questlog || helpflag || talkflag || qtextflag)
 		return;
 	if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
 		return;
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000) { // similar to X button on PS1 ccontroller. Talk to towners, click on inv items, attack.
-		if (invflag) {
+		if (invflag) { // inventory is open
+			//if (pcurs >= CURSOR_FIRSTITEM) {
+			//	pcursitem = pcurs;
+			//}
+			sprintf(tempstr, "INVENTORY IS OPEN, CLICKING X:%i Y:%i", MouseX, MouseY);
+			NetSendCmdString(1 << myplr, tempstr);
 			LeftMouseCmd(false);
+			//realClick(MouseX, MouseY);
 		} else {
 			HideCursor();
 			checkTownersNearby(true);
 			checkMonstersNearby(true, false);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
-		if (!invflag) {
-			HideCursor();
+		HideCursor();
+		//if (ticks - opentimer >= 2000) {
 			checkItemsNearby(true);
-		}
+		//}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
 		checkMonstersNearby(false, true);

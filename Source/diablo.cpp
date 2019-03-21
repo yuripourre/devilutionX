@@ -1069,8 +1069,9 @@ void __fastcall PressKey(int vkey)
 				diablo_hotkey_msg(2);
 			if (v1 == VK_F12)
 				diablo_hotkey_msg(3);
-			if (v1 == VK_RETURN)
+			if (v1 == VK_RETURN) {
 				control_type_message();
+			}
 			if (v1 == VK_ESCAPE) {
 			LABEL_113:
 				if (v1 == VK_ESCAPE) {
@@ -1441,7 +1442,7 @@ void __fastcall PressChar(int vkey)
 					newCurHidden = false;
 				}
 				SetCursorPos(350, 240); // inv cells are 29x29
-				return; // don't do the other cursor move stuff
+				return;                 // don't do the other cursor move stuff
 				//
 				if (!v4 || chrflag) {
 				LABEL_24:
