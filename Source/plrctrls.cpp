@@ -83,8 +83,10 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 // hide the cursor when we start walking via keyboard/controller
 void HideCursor()
 {
-	SetCursorPos((dh/2), (dw/2));
+	SetCursorPos(320, 180);
 	FreeCursor();
+	DestroyCursor(LoadCursor(0, IDC_ARROW));
+	//pcurs = CURSOR_NONE;
 	newCurHidden = true;
 }
 
@@ -210,8 +212,10 @@ void __fastcall keyboardExpension()
 			checkMonstersNearby(true, false);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
-		HideCursor();
-		checkItemsNearby(true);
+		if (!invflag) {
+			HideCursor();
+			checkItemsNearby(true);
+		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
 		checkMonstersNearby(false, true);

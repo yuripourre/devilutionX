@@ -677,15 +677,16 @@ LRESULT CALLBACK GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_MOUSEMOVE:
-		if (newCurHidden) {
-			InitCursor();
-			newCurHidden = false;
-		}
 		MouseX = LOWORD(lParam);
 		MouseY = HIWORD(lParam);
 		gmenu_on_mouse_move(LOWORD(lParam));
 		return 0;
 	case WM_LBUTTONDOWN:
+		if (newCurHidden) {
+			InitCursor();
+			pcurs = CURSOR_HAND;
+			newCurHidden = false;
+		}
 		MouseX = LOWORD(lParam);
 		MouseY = HIWORD(lParam);
 		if (sgbMouseDown == 0) {
@@ -1215,6 +1216,8 @@ void __fastcall PressKey(int vkey)
 							DoAutoMap();
 							return;
 						case VK_SPACE:
+							if (invflag) // JAKE: Don't close the inventory window
+								return;
 							if (!chrflag) {
 								if (!invflag) {
 								LABEL_106:
@@ -1432,8 +1435,9 @@ void __fastcall PressChar(int vkey)
 				v4 = invflag == 0;
 				invflag = invflag == 0;
 				// JAKE: Show cursor if inventory window open, set cursor to inv slot 1
-				if (!newCurHidden) {
+				if (newCurHidden) {
 					InitCursor();
+					pcurs = CURSOR_HAND;
 					newCurHidden = false;
 				}
 				SetCursorPos(350, 240); // inv cells are 29x29
