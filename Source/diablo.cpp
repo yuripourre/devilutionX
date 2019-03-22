@@ -1438,7 +1438,7 @@ void __fastcall PressChar(int vkey)
 					SetCursor_(CURSOR_HAND);
 					newCurHidden = false;
 				}
-				SetCursorPos(350, 240); // inv cells are 29x29
+				SetCursorPos((InvRect[25].X + (INV_SLOT_SIZE_PX / 2)), (InvRect[25].Y - (INV_SLOT_SIZE_PX / 2))); // inv cells are 29x29
 				return;                 // don't do the other cursor move stuff
 				//
 				if (!v4 || chrflag) {
@@ -1510,6 +1510,7 @@ void __fastcall PressChar(int vkey)
 						msgdelay = 0;
 						gamemenu_off();
 						doom_close(); //goto LABEL_110;
+						return;
 					}
 					v4 = MouseX;
 					if (MouseX >= 480 || MouseY >= 352) {

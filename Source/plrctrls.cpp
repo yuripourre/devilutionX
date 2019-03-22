@@ -23,7 +23,7 @@ closestMonster checkNearbyObjs(int x, int y, int diff)
 		closestMonster cm = { diff_x, diff_y };
 		return cm;
 	}
-	return {-1, -1};
+	return { -1, -1 };
 }
 
 void __fastcall checkItemsNearby(bool interact)
@@ -32,9 +32,9 @@ void __fastcall checkItemsNearby(bool interact)
 		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1).x != -1 && item[i]._iSelFlag > 0) {
 			pcursitem = i;
 			//if (newCurHidden) {
-				if (dItem[item[i]._ix][item[i]._iy] <= 0)
-					continue;
-				//SetCursorPos(item[i]._ix, item[i]._iy);
+			if (dItem[item[i]._ix][item[i]._iy] <= 0)
+				continue;
+			//SetCursorPos(item[i]._ix, item[i]._iy);
 			//}
 			//sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
 			//NetSendCmdString(1 << myplr, tempstr);
@@ -75,7 +75,7 @@ void __fastcall checkTownersNearby(bool interact)
 
 bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 {
-	int closest = 0;      // monster ID who is closest
+	int closest = 0;                         // monster ID who is closest
 	closestMonster objDistLast = { 99, 99 }; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
 		int d_monster = dMonster[monster[i]._mx][monster[i]._my + 1];
@@ -83,7 +83,7 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 			continue;
 		//if (d_monster && dFlags[monster[i]._mx][monster[i]._my + 1] & DFLAG_LIT) { // is monster visible
 		//	if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
-				closestMonster objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
+		closestMonster objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
 		if (objDist.x > -1 && objDist.x < objDistLast.x && objDist.y < objDistLast.y) {
 			closest = i;
 			objDistLast = objDist;
@@ -95,7 +95,7 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 		pcursmonst = closest;
 		//sprintf(tempstr, "NEARBY MONSTER WITH HP:%i", monster[closest]._mhitpoints);
 		//NetSendCmdString(1 << myplr, tempstr);
-	} else if (closest > 0){ // found monster, but we don't want to attack it
+	} else if (closest > 0) { // found monster, but we don't want to attack it
 		return true;
 	} else {
 		pcursmonst = -1;
@@ -127,7 +127,7 @@ void HideCursor()
 
 static DWORD invmove;
 DWORD ticks;
-
+int slot = 25;
 // move the cursor around in our inventory
 // if mouse coords are at SLOTXY_CHEST_LAST, consider this center of equipment
 // small inventory squares are 29x29 (roughly)
@@ -141,92 +141,101 @@ void invMove(int key)
 	invmove = ticks;
 	int x = MouseX;
 	int y = MouseY;
+
+	int hold_x = MouseX;
+	int hold_y = MouseY;
+
+	// held items throw the grid system off
+	if (plr[myplr].HoldItem._itype > 0) {
+		hold_x = MouseX + (cursW >> 1);
+		hold_y = MouseY + (cursH >> 1);
+	}
+
+	// check which inventory rectangle the mouse is in, if any
+	for (int r = 0; (DWORD)r < NUM_XY_SLOTS; r++) {
+		if (hold_x >= InvRect[r].X && hold_x < InvRect[r].X + (INV_SLOT_SIZE_PX + 1) && hold_y >= InvRect[r].Y - (INV_SLOT_SIZE_PX + 1) && hold_y < InvRect[r].Y) {
+			slot = r;
+			break;
+		}
+	}
+
+	// when item is on cursor, this is the real cursor XY
 	if (key == VK_LEFT) {
-		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // chest to left hand
-			x = InvRect[SLOTXY_HAND_LEFT_LAST].X;
-			y = InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // right hand to chest
-			x = InvRect[SLOTXY_CHEST_LAST].X;
-			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-		} else if (x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // right ring to left ring
-			x = InvRect[SLOTXY_RING_LEFT].X + 5;
-			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
-		} else if (x == (InvRect[SLOTXY_AMULET].X + 5) && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // amulet to head
-			x = InvRect[SLOTXY_HEAD_LAST].X;
-			y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
-		} else if (x < dw && x > inv_left && y >= inv_top) {
-			x = x - 29;
+		// general inventory
+		if (slot > SLOTXY_INV_FIRST) {
+			slot--;
 		}
+		if (plr[myplr].HoldItem._itype > 0)
+			x -= ((cursW >> 1) / 2);
+		x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 	} else if (key == VK_RIGHT) {
-		if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // chest to right hand
-			x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
-			y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // left hand to chest
-			x = InvRect[SLOTXY_CHEST_LAST].X;
-			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-		} else if (x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // left ring to right ring
-			x = InvRect[SLOTXY_RING_RIGHT].X + 5;
-			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
-		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // head to amulet
-			x = InvRect[SLOTXY_AMULET].X + 5;
-			y = InvRect[SLOTXY_AMULET].Y - 5;
-		} else if (x < dw && x >= inv_left && y >= inv_top) {
-			x = x + 29;
+		// general inventory
+		if (slot < SLOTXY_INV_LAST && slot > SLOTXY_INV_FIRST) {
+			slot++;
 		}
+		if (plr[myplr].HoldItem._itype > 0)
+			x -= ((cursW >> 1) / 2);
+		x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 	} else if (key == VK_UP) {
-		if (y > inv_top && x >= inv_left) {
-			y = y - 29;
-		} else { // go into equipment spaces
-			if (x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) { // if at chest, go to head
-				x = InvRect[SLOTXY_HEAD_LAST].X;
-				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
-			} else if (x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5)) { // if at right ring, go to right hand
-				x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
-				y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
-			} else if (x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) { // if at left ring, go to left hand
-				x = InvRect[SLOTXY_HAND_LEFT_LAST].X;
-				y = InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5;
-			} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to head
-				x = InvRect[SLOTXY_HEAD_LAST].X;
-				y = InvRect[SLOTXY_HEAD_LAST].Y - 5;
-			} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to amulet
-				x = InvRect[SLOTXY_AMULET].X + 5;
-				y = InvRect[SLOTXY_AMULET].Y - 5;
-			} else if (y == inv_top) { // general inventory, go to chest
-				if (x >= inv_left && x < 422) { // left side goes up to left ring
-					x = InvRect[SLOTXY_RING_LEFT].X + 5;
-					y = InvRect[SLOTXY_RING_LEFT].Y - 5;
-				} else if (x > 567 && x < dw) { // right side goes up to right ring
-					x = InvRect[SLOTXY_RING_RIGHT].X + 5;
-					y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
-				} else { // center goes to chest
-					x = InvRect[SLOTXY_CHEST_LAST].X;
-					y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-				}
+		// general inventory
+		if (slot > (SLOTXY_INV_FIRST + 10)) {
+			slot -= 10;
+			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
+		} else {                            // going up into equipment
+			if (slot >= 25 && slot <= 27) { // first 3 general slots
+				x = InvRect[SLOTXY_RING_LEFT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_LEFT].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= 28 && slot <= 32) { // middle 4 general slots
+				x = InvRect[SLOTXY_CHEST_FIRST + 3].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_CHEST_FIRST + 3].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= 33 && slot <= 36) { // last 3 general slots
+				x = InvRect[SLOTXY_RING_RIGHT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_RIGHT].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_CHEST_FIRST && slot <= SLOTXY_CHEST_LAST) { // chest to head
+				x = InvRect[SLOTXY_HEAD_FIRST + 1].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HEAD_FIRST + 1].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_RING_LEFT) { // left ring to left hand
+				x = InvRect[SLOTXY_HAND_LEFT_FIRST + 2].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HAND_LEFT_FIRST + 2].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_RING_RIGHT) { // right ring to right hand
+				x = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_HAND_RIGHT_FIRST && slot <= SLOTXY_HAND_RIGHT_LAST) { // right hand to amulet
+				x = InvRect[SLOTXY_AMULET].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_AMULET].Y - (INV_SLOT_SIZE_PX / 2);
 			}
 		}
 	} else if (key == VK_DOWN) {
-		if ((x == InvRect[SLOTXY_CHEST_LAST].X && y == (InvRect[SLOTXY_CHEST_LAST].Y - 5)) ||
-			(x == (InvRect[SLOTXY_RING_LEFT].X + 5) && y == (InvRect[SLOTXY_RING_LEFT].Y - 5)) ||
-			(x == (InvRect[SLOTXY_RING_RIGHT].X + 5) && y == (InvRect[SLOTXY_RING_RIGHT].Y - 5))) { // go back to general inventory
-			x = 350;
-			y = 240;
-		} else if ((x == InvRect[SLOTXY_AMULET].X + 5) && y == (InvRect[SLOTXY_AMULET].Y - 5)) { // if at amulet, go to right hand
-			x = InvRect[SLOTXY_HAND_RIGHT_LAST].X;
-			y = InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_HEAD_LAST].X && y == (InvRect[SLOTXY_HEAD_LAST].Y - 5)) { // if at head, go to chest
-			x = InvRect[SLOTXY_CHEST_LAST].X;
-			y = InvRect[SLOTXY_CHEST_LAST].Y - 5;
-		} else if (x == InvRect[SLOTXY_HAND_LEFT_LAST].X && y == (InvRect[SLOTXY_HAND_LEFT_LAST].Y - 5)) { // if at left hand, go to left ring
-			x = InvRect[SLOTXY_RING_LEFT].X + 5;
-			y = InvRect[SLOTXY_RING_LEFT].Y - 5;
-		} else if (x == InvRect[SLOTXY_HAND_RIGHT_LAST].X && y == (InvRect[SLOTXY_HAND_RIGHT_LAST].Y - 5)) { // if at right hand, go to right ring
-			x = InvRect[SLOTXY_RING_RIGHT].X + 5;
-			y = InvRect[SLOTXY_RING_RIGHT].Y - 5;
-		} else if (y >= inv_top && y < inv_height) { // general inventory area
-			y = y + 29;
+		// general inventory
+		if (slot < (SLOTXY_INV_LAST - 10)) {
+			slot += 10;
+			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
+		} else { // equipment section
+			if (slot >= SLOTXY_HEAD_FIRST && slot <= SLOTXY_HEAD_LAST) {
+				x = InvRect[SLOTXY_CHEST_FIRST + 3].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_CHEST_FIRST + 3].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_CHEST_FIRST && slot <= SLOTXY_CHEST_LAST) {
+				x = InvRect[30].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[30].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_HAND_LEFT_FIRST && slot <= SLOTXY_HAND_LEFT_LAST) {
+				x = InvRect[SLOTXY_RING_LEFT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_LEFT].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_RING_LEFT) {
+				x = InvRect[26].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[26].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_RING_RIGHT) {
+				x = InvRect[34].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[34].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_AMULET) {
+				x = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_HAND_RIGHT_FIRST && slot <= SLOTXY_HAND_RIGHT_LAST) {
+				x = InvRect[SLOTXY_RING_RIGHT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_RIGHT].Y - (INV_SLOT_SIZE_PX / 2);
+			}
 		}
 	}
+
 	SetCursorPos(x, y);
 }
 
@@ -239,34 +248,20 @@ void walkInDir(int dir)
 	plr[myplr].walkpath[0] = dir;
 }
 
-// clicks outside of game
-/*void realClick(int x, int y)
-{
-	INPUT input;
-	input.type = INPUT_MOUSE;
-	input.mi.dx = x;
-	input.mi.dy = y;
-	input.mi.dwFlags = (MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP);
-	input.mi.mouseData = 0;
-	input.mi.dwExtraInfo = NULL;
-	input.mi.time = 0;
-	SendInput(1, &input, sizeof(INPUT));
-}*/
-
 void __fastcall keyboardExpension()
 {
 	static DWORD opentimer;
 	static DWORD clickinvtimer;
 	ticks = GetTickCount();
 
+	// TEST: inv - x:336 y:198
+
 	if (stextflag || questlog || helpflag || talkflag || qtextflag)
 		return;
 	if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
 		return;
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000) { // similar to X button on PS1 ccontroller. Talk to towners, click on inv items, attack.
-		if (invflag) { // inventory is open
-			//sprintf(tempstr, "INVENTORY IS OPEN, CLICKING X:%i Y:%i", MouseX, MouseY);
-			//NetSendCmdString(1 << myplr, tempstr);
+		if (invflag) {                         // inventory is open
 			if (ticks - clickinvtimer >= 300) {
 				clickinvtimer = ticks;
 				CheckInvItem();
