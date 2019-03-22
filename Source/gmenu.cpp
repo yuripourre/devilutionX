@@ -305,7 +305,13 @@ BOOL __fastcall gmenu_presskeys(int a1)
 		gmenu_call_proc(0, 0);
 		break;
 	case VK_SPACE:
-		return FALSE;
+		// JAKE: I want space to do the same as the enter key
+		if ((sgpCurrItem->dwFlags & 0x80000000) != 0) {
+			PlaySFX(IS_TITLEMOV);
+			((void(__fastcall *)(signed int))sgpCurrItem->fnMenu)(1);
+		}
+		break;
+		//return FALSE; // original
 	case VK_LEFT:
 		gmenu_left_right(0);
 		break;

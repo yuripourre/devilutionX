@@ -13,7 +13,8 @@ const char gszHelpText[] = {
 	"F1:    Open Help Screen|"
 	"Esc:   Display Main Menu|"
 	"Tab:   Display Auto-map|"
-	"Space: Hide all info screens, attack nearby monsters, talk to nearby towns people|" // JAKE: Changed
+	"Space: attack nearby monsters, talk to nearby towns people, select inventory items|" // JAKE: Changed
+	"Z: Hide all info screens|" // JAKE: Used to be space, now it's Z.
 	"Enter: Pickup nearby gold and items. Open nearby chests|" // JAKE: Changed
 	"H: Open Speedbook|" // JAKE: Changed, used to be S key
 	"B: Open Spellbook|"
@@ -22,8 +23,8 @@ const char gszHelpText[] = {
 	"Q: Open Quest log|"
 	"F: Reduce screen brightness|"
 	"G: Increase screen brightness|"
-	"X: Cast Spell|" // Jake: Added new key
-	"Z: Zoom Game Screen|"
+	"X: Cast Spell or use skill|" // Jake: Added new key
+	"[: Zoom Game Screen|" // Jake: Changed from Z to [
 	"+ / -: Zoom Automap|"
 	"1 - 8: Use Belt item|"
 	"F5, F6, F7, F8:     Set hot key for skill or spell|"

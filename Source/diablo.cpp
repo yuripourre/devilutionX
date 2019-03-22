@@ -1215,10 +1215,9 @@ void __fastcall PressKey(int vkey)
 						case VK_TAB:
 							DoAutoMap();
 							return;
-						case VK_SPACE:
-							if (invflag) // JAKE: Don't close the inventory window
+						case VK_SPACE: // JAKE: No longer goes back or hides menus
 								return;
-							if (!chrflag) {
+							/*if (!chrflag) {
 								if (!invflag) {
 								LABEL_106:
 									helpflag = 0;
@@ -1246,7 +1245,7 @@ void __fastcall PressKey(int vkey)
 								SetCursorPos(MouseX + 160, MouseY);
 							}
 							v4 = MouseX;
-							goto LABEL_101;
+							goto LABEL_101;*/
 						}
 					}
 				}
@@ -1493,6 +1492,39 @@ void __fastcall PressChar(int vkey)
 				return;
 			case 'Z':
 			case 'z':
+				// JAKE: Spacebar used to go back, now Z goes back.
+				if (!chrflag) {
+					if (!invflag) {
+					LABEL_106:
+						helpflag = 0;
+						invflag = 0;
+						chrflag = 0;
+						sbookflag = 0;
+						spselflag = 0;
+						if (qtextflag && leveltype == DTYPE_TOWN) {
+							qtextflag = FALSE;
+							sfx_stop();
+						}
+						questlog = 0;
+						automapflag = 0;
+						msgdelay = 0;
+						gamemenu_off();
+						doom_close(); //goto LABEL_110;
+					}
+					v4 = MouseX;
+					if (MouseX >= 480 || MouseY >= 352) {
+					LABEL_101:
+						if (!invflag && chrflag && v4 > 160 && MouseY < 352)
+							SetCursorPos(v4 - 160, MouseY);
+						goto LABEL_106;
+					}
+					SetCursorPos(MouseX + 160, MouseY);
+				}
+				v4 = MouseX;
+				goto LABEL_101;
+				return;
+			case '[': // JAKE: Z key used to zoom in/out.
+			case '{':
 				zoomflag = zoomflag == 0;
 				return;
 #ifdef _DEBUG
@@ -1516,10 +1548,10 @@ void __fastcall PressChar(int vkey)
 				if (!currlevel && debug_mode_key_w)
 					SetAllSpellsCheat();
 				return;
-			case '[':
-				if (!currlevel && debug_mode_key_w)
-					TakeGoldCheat();
-				return;
+			//case '[': // JAKE: This was the old code. This is pointless.
+			//	if (!currlevel && debug_mode_key_w)
+			//		TakeGoldCheat();
+			//	return;
 			case ']':
 				if (!currlevel && debug_mode_key_w)
 					MaxSpellsCheat();
