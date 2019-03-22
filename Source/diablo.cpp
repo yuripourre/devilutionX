@@ -683,8 +683,7 @@ LRESULT CALLBACK GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_LBUTTONDOWN:
 		if (newCurHidden) {
-			InitCursor();
-			pcurs = CURSOR_HAND;
+			SetCursor_(CURSOR_HAND);
 			newCurHidden = false;
 		}
 		MouseX = LOWORD(lParam);
@@ -1437,8 +1436,7 @@ void __fastcall PressChar(int vkey)
 				invflag = invflag == 0;
 				// JAKE: Show cursor if inventory window open, set cursor to inv slot 1
 				if (newCurHidden) {
-					InitCursor();
-					pcurs = CURSOR_HAND;
+					SetCursor_(CURSOR_HAND);
 					newCurHidden = false;
 				}
 				SetCursorPos(350, 240); // inv cells are 29x29
@@ -1968,8 +1966,11 @@ void __cdecl game_logic()
 			// JAKE: PLRCTRLS
 			// check for monsters first, then towners or objs.
 			if (!checkMonstersNearby(false, false)) {
+				pcursmonst = -1;
 				checkTownersNearby(false);
 				checkItemsNearby(false);
+			} else {
+				pcursitem = -1;
 			}
 			keyboardExpension();
 			//
