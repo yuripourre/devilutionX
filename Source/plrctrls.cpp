@@ -163,23 +163,52 @@ void invMove(int key)
 	if (key == VK_LEFT) {
 		// general inventory
 		if (slot > SLOTXY_INV_FIRST) {
-			slot--;
+			slot -= 1;
+			//if (plr[myplr].HoldItem._itype > 0)
+			//x -= ((cursW >> 1) / 2);
+			x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
+			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
+		} else { // equipment
+			if (slot >= SLOTXY_HAND_RIGHT_FIRST && slot <= SLOTXY_HAND_RIGHT_LAST) {
+				x = InvRect[SLOTXY_CHEST_FIRST + 3].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_CHEST_FIRST + 3].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_CHEST_FIRST && slot <= SLOTXY_CHEST_LAST) {
+				x = InvRect[SLOTXY_HAND_LEFT_FIRST + 2].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HAND_LEFT_FIRST + 2].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_AMULET) {
+				x = InvRect[SLOTXY_HEAD_FIRST + 1].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HEAD_FIRST + 1].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot == SLOTXY_RING_RIGHT) {
+				x = InvRect[SLOTXY_RING_LEFT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_LEFT].Y - (INV_SLOT_SIZE_PX / 2);
+			}
 		}
-		if (plr[myplr].HoldItem._itype > 0)
-			x -= ((cursW >> 1) / 2);
-		x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 	} else if (key == VK_RIGHT) {
 		// general inventory
-		if (slot < SLOTXY_INV_LAST && slot > SLOTXY_INV_FIRST) {
-			slot++;
+		if (slot < SLOTXY_INV_LAST || slot >= SLOTXY_INV_FIRST) {
+			slot += 1;
+			x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
+			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
+		} else { // equipment
+			if (slot == SLOTXY_RING_LEFT) {
+				x = InvRect[SLOTXY_RING_RIGHT].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_RING_RIGHT].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_HAND_LEFT_FIRST && slot <= SLOTXY_HAND_LEFT_LAST) {
+				x = InvRect[SLOTXY_CHEST_FIRST + 3].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_CHEST_FIRST + 3].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_CHEST_FIRST && slot <= SLOTXY_CHEST_LAST) {
+				x = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_HAND_RIGHT_FIRST + 2].Y - (INV_SLOT_SIZE_PX / 2);
+			} else if (slot >= SLOTXY_HEAD_FIRST && slot <= SLOTXY_HEAD_LAST) {
+				x = InvRect[SLOTXY_AMULET].X + (INV_SLOT_SIZE_PX / 2);
+				y = InvRect[SLOTXY_AMULET].Y - (INV_SLOT_SIZE_PX / 2);
+			}
 		}
-		if (plr[myplr].HoldItem._itype > 0)
-			x -= ((cursW >> 1) / 2);
-		x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 	} else if (key == VK_UP) {
 		// general inventory
 		if (slot > (SLOTXY_INV_FIRST + 10)) {
 			slot -= 10;
+			x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
 		} else {                            // going up into equipment
 			if (slot >= 25 && slot <= 27) { // first 3 general slots
@@ -209,6 +238,7 @@ void invMove(int key)
 		// general inventory
 		if (slot < (SLOTXY_INV_LAST - 10)) {
 			slot += 10;
+			x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 			y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
 		} else { // equipment section
 			if (slot >= SLOTXY_HEAD_FIRST && slot <= SLOTXY_HEAD_LAST) {
@@ -235,6 +265,11 @@ void invMove(int key)
 			}
 		}
 	}
+
+	/*if (plr[myplr].HoldItem._itype > 0) {
+		x += ((cursW >> 1) / 2);
+		y += ((cursH >> 1) / 2);
+	}*/
 
 	SetCursorPos(x, y);
 }
