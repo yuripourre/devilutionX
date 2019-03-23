@@ -1252,8 +1252,11 @@ LABEL_18:
 				v60 = p;
 				CalcPlrInv(p, 1u);
 				if (v60 == myplr) {
-					if (cursor_ida == 1)
-						SetCursorPos(MouseX + (cursW >> 1), MouseY + (cursH >> 1));
+					// JAKE: [2] Keep item in the same slot, don't jump it up
+						//if (cursor_ida == 1)
+						//	SetCursorPos(MouseX + (cursW >> 1), MouseY + (cursH >> 1));
+						SetCursorPos(MouseX + 10, MouseY + 10);
+					// end
 					SetCursor_(cursor_ida);
 				}
 				return;
@@ -1520,7 +1523,12 @@ void __fastcall CheckInvCut(int pnum, int mx, int my)
 		if (pnum == myplr) {
 			PlaySFX(IS_IGRAB);
 			SetCursor_(plr[pnum].HoldItem._iCurs + CURSOR_FIRSTITEM);
-			SetCursorPos(mx - (cursW >> 1), MouseY - (cursH >> 1));
+			// JAKE: [1] Keep item in the same slot, don't jump it up
+				//SetCursorPos(mx - (cursW >> 1), MouseY - (cursH >> 1));
+				if (pcurs > 1) {
+					SetCursorPos(mx - 10, MouseY - 10);
+				}
+			// end
 		}
 	}
 }

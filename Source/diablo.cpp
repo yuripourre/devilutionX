@@ -677,6 +677,8 @@ LRESULT CALLBACK GM_Game(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_MOUSEMOVE:
+		//sprintf(tempstr, "HELD ITEM:%i", pcurs);
+		//NetSendCmdString(1 << myplr, tempstr);
 		MouseX = LOWORD(lParam);
 		MouseY = HIWORD(lParam);
 		gmenu_on_mouse_move(LOWORD(lParam));

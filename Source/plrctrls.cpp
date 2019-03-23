@@ -209,13 +209,13 @@ void invMove(int key)
 				}
 		}
 	} else if (key == VK_UP) {
-			if (slot >= 25 && slot <= 27) { // first 3 general slots
+			if (slot > 24 && slot <= 27) { // first 3 general slots
 				x = InvRect[SLOTXY_RING_LEFT].X + (INV_SLOT_SIZE_PX / 2);
 				y = InvRect[SLOTXY_RING_LEFT].Y - (INV_SLOT_SIZE_PX / 2);
 			} else if (slot >= 28 && slot <= 32) { // middle 4 general slots
 				x = InvRect[SLOTXY_CHEST_FIRST + 3].X + (INV_SLOT_SIZE_PX / 2);
 				y = InvRect[SLOTXY_CHEST_FIRST + 3].Y - (INV_SLOT_SIZE_PX / 2);
-			} else if (slot >= 33 && slot <= 36) { // last 3 general slots
+			} else if (slot >= 33 && slot < 35) { // last 3 general slots
 				x = InvRect[SLOTXY_RING_RIGHT].X + (INV_SLOT_SIZE_PX / 2);
 				y = InvRect[SLOTXY_RING_RIGHT].Y - (INV_SLOT_SIZE_PX / 2);
 			} else if (slot >= SLOTXY_CHEST_FIRST && slot <= SLOTXY_CHEST_LAST) { // chest to head
@@ -237,7 +237,7 @@ void invMove(int key)
 			    y = InvRect[SLOTXY_HEAD_FIRST + 1].Y - (INV_SLOT_SIZE_PX / 2);
 		    } else if (slot == SLOTXY_AMULET) {
 				// do nothing
-		    } else if (slot > (SLOTXY_INV_FIRST + 10)) { // general inventory
+		    } else if (slot >= (SLOTXY_INV_FIRST + 10)) { // general inventory
 			    slot -= 10;
 			    x = InvRect[slot].X + (INV_SLOT_SIZE_PX / 2);
 			    y = InvRect[slot].Y - (INV_SLOT_SIZE_PX / 2);
@@ -271,7 +271,12 @@ void invMove(int key)
 			}
 		}
 
-	SetCursorPos(x, y);
+	if (pcurs > 1) { // [3] Keep item in the same slot, don't jump it up
+		if (x != MouseX) // without this, the cursor keeps moving -10
+			SetCursorPos((x - 10), (y - 10));
+	}
+	else
+		SetCursorPos(x, y);
 }
 
 // walk in the direction specified
@@ -307,10 +312,12 @@ void __fastcall keyboardExpension()
 			checkMonstersNearby(true, false);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
-		HideCursor();
-		if (ticks - opentimer >= 300) {
-			opentimer = ticks;
-			checkItemsNearby(true);
+		if (!invflag) {
+			HideCursor();
+			if (ticks - opentimer >= 300) {
+				opentimer = ticks;
+				checkItemsNearby(true);
+			}
 		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
