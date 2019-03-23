@@ -9,7 +9,7 @@ Adding keyboard movements and controller support.
 ## New Features
 
 - Spacebar - Attack nearby enemies, talk to towns people and merchants.
-- Enter - Pickup gold, potions & equipment from ground and open chests that are nearby.
+- Enter - Pickup gold, potions & equipment from ground, open chests and doors that are nearby.
 - Arrow Keys and WASD Keys - Move character in that direction. Has diagonals programmed.
 - X Key - Cast spell at nearby enemies.
 - Z Key - Hide/Back Out of menus.
