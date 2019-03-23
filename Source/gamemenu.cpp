@@ -131,7 +131,7 @@ void __cdecl gamemenu_load_game()
 
 void __cdecl gamemenu_save_game()
 {
-	if (pcurs == CURSOR_HAND) {
+	if (pcurs <= CURSOR_HAND) { // JAKE: Also let people save if cursor disappears
 		if (plr[myplr]._pmode == PM_DEATH || deathflag) {
 			gamemenu_off();
 		} else {

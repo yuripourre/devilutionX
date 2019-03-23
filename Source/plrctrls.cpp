@@ -7,6 +7,10 @@ int dw = DISPLAY_WIDTH;
 int inv_top = INV_TOP;
 int inv_left = INV_LEFT;
 int inv_height = INV_HEIGHT;
+static DWORD attacktick;
+static DWORD invmove;
+DWORD ticks;
+int slot = SLOTXY_INV_FIRST;
 
 struct closestMonster {
 	int x;
@@ -36,8 +40,8 @@ void __fastcall checkItemsNearby(bool interact)
 			if (dItem[item[i]._ix][item[i]._iy] <= 0)
 				continue;
 			if (interact) {
-				sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
-				NetSendCmdString(1 << myplr, tempstr);
+				//sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
+				//NetSendCmdString(1 << myplr, tempstr);
 				SetCursorPos(item[i]._ix, item[i]._iy);
 				LeftMouseCmd(false);
 			}
@@ -73,13 +77,13 @@ void __fastcall checkTownersNearby(bool interact)
 	}
 }
 
-bool __fastcall checkMonstersNearby(bool attack, bool castspell)
+bool __fastcall checkMonstersNearby(bool attack)
 {
 	int closest = 0;                         // monster ID who is closest
 	closestMonster objDistLast = { 99, 99 }; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
 		int d_monster = dMonster[monster[i]._mx][monster[i]._my];
-		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // is monster is hidding or dead, skip
+		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // monster is hiding or dead, skip
 			continue;
 		if (d_monster && dFlags[monster[i]._mx][monster[i]._my] & DFLAG_LIT) { // is monster visible
 			if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
@@ -91,7 +95,7 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 			}
 		}
 	}
-	if (closest > 0 && (attack || castspell)) { // did we find a monster, and want to attack it?
+	if (closest > 0) { // did we find a monster
 		pcursmonst = closest;
 		//sprintf(tempstr, "NEARBY MONSTER WITH HP:%i", monster[closest]._mhitpoints);
 		//NetSendCmdString(1 << myplr, tempstr);
@@ -102,10 +106,10 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 		return false;
 	}
 	if (attack) {
-		LeftMouseCmd(false);
-		return true;
-	} else if (castspell) {
-		RightMouseDown();
+		if (ticks - attacktick > 100) { // prevent accidental double attacks
+			attacktick = ticks;
+			LeftMouseCmd(false);
+		}
 		return true;
 	} else {
 		return true;
@@ -125,9 +129,6 @@ void HideCursor()
 	newCurHidden = true;
 }
 
-static DWORD invmove;
-DWORD ticks;
-int slot = SLOTXY_INV_FIRST;
 // move the cursor around in our inventory
 // if mouse coords are at SLOTXY_CHEST_LAST, consider this center of equipment
 // small inventory squares are 29x29 (roughly)
@@ -282,8 +283,10 @@ void invMove(int key)
 // walk in the direction specified
 void walkInDir(int dir)
 {
-	if (invflag) // don't walk if inventory window is open
+	if (invflag || spselflag || chrflag) // don't walk if inventory, speedbook or char info windows are open
 		return;
+	ClrPlrPath(myplr); // clear nodes
+	plr[myplr].destAction = ACTION_NONE; // stop attacking, etc.
 	HideCursor();
 	plr[myplr].walkpath[0] = dir;
 }
@@ -293,8 +296,6 @@ void __fastcall keyboardExpension()
 	static DWORD opentimer;
 	static DWORD clickinvtimer;
 	ticks = GetTickCount();
-
-	// TEST: inv - x:336 y:198
 
 	if (stextflag || questlog || helpflag || talkflag || qtextflag)
 		return;
@@ -308,7 +309,7 @@ void __fastcall keyboardExpension()
 			}
 		} else {
 			HideCursor();
-			if (!checkMonstersNearby(true, false))
+			if (!checkMonstersNearby(true))
 				checkTownersNearby(true);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
@@ -321,7 +322,7 @@ void __fastcall keyboardExpension()
 		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
-		checkMonstersNearby(false, true);
+		RightMouseDown();
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
 		walkInDir(WALK_SE);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x44) & 0x8000) {

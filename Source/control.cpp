@@ -1147,7 +1147,7 @@ void __cdecl DoSpeedBook()
 	X = 600;
 	Y = 307;
 	if (plr[myplr]._pRSpell != -1) {
-		for (i = 0; i < 4; i++) {
+		for (i = 0; i < 4; i++) { // 4 rows
 			switch (i) {
 			case RSPLTYPE_SKILL:
 				spells = plr[myplr]._pAblSpells;

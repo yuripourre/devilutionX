@@ -3645,9 +3645,9 @@ void __fastcall CheckPlrSpell()
 		return;
 	}
 
-	if (pcurs != CURSOR_HAND
+	if (pcurs > CURSOR_HAND
 	    || MouseY >= 352
-	    || (chrflag && MouseX < 320 || invflag && MouseX > 320)
+	    || (chrflag && MouseX < 320 || invflag && MouseX > 320) // JAKE: Let players without cursors cast too
 	        && rspell != SPL_HEAL
 	        && rspell != SPL_IDENTIFY
 	        && rspell != SPL_REPAIR

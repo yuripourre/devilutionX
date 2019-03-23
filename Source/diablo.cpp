@@ -852,7 +852,7 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
 	BOOL bNear;
 
 	if (!leveltype) { // in town
-		if (pcursitem != -1 /*&& pcurs == CURSOR_HAND*/) // JAKE: nope
+		if (pcursitem != -1 && pcurs <= CURSOR_HAND) // JAKE: allow no cursor as well
 			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
 		if (pcursmonst != -1)
 			NetSendCmdLocParam1(TRUE, CMD_TALKXY, cursmx, cursmy, pcursmonst);
@@ -860,7 +860,7 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
 			return TRUE;
 	} else { // in dungeon
 		bNear = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
-		if (pcursitem != -1 /*&& pcurs == CURSOR_HAND*/ && !bShift) { // JAKE: nope
+		if (pcursitem != -1 && pcurs <= CURSOR_HAND && !bShift) { // JAKE: allow no cursor as well
 			NetSendCmdLocParam1(pcurs, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
 		} else if (pcursobj != -1 && (!bShift || bNear && object[pcursobj]._oBreak == 1)) {
 			NetSendCmdLocParam1(TRUE, pcurs == CURSOR_DISARM ? CMD_DISARMXY : CMD_OPOBJXY, cursmx, cursmy, pcursobj);
@@ -996,7 +996,7 @@ void __cdecl RightMouseDown()
 			    || (!sbookflag || MouseX <= 320)
 			        && !TryIconCurs()
 			        && (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))) {
-				if (pcurs == 1) {
+				if (pcurs <= 1) { // JAKE: Allow people without cursor to cast spells too
 					if (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))
 						CheckPlrSpell();
 				} else if (pcurs > 1 && pcurs < 12) {
@@ -1217,37 +1217,15 @@ void __fastcall PressKey(int vkey)
 						case VK_TAB:
 							DoAutoMap();
 							return;
-						case VK_SPACE: // JAKE: No longer goes back or hides menus
-								return;
-							/*if (!chrflag) {
-								if (!invflag) {
-								LABEL_106:
-									helpflag = 0;
-									invflag = 0;
-									chrflag = 0;
-									sbookflag = 0;
-									spselflag = 0;
-									if (qtextflag && leveltype == DTYPE_TOWN) {
-										qtextflag = FALSE;
-										sfx_stop();
-									}
-									questlog = 0;
-									automapflag = 0;
-									msgdelay = 0;
-									gamemenu_off();
-									goto LABEL_110;
-								}
-								v4 = MouseX;
-								if (MouseX >= 480 || MouseY >= 352) {
-								LABEL_101:
-									if (!invflag && chrflag && v4 > 160 && MouseY < 352)
-										SetCursorPos(v4 - 160, MouseY);
-									goto LABEL_106;
-								}
-								SetCursorPos(MouseX + 160, MouseY);
+						case VK_SPACE: // JAKE: No longer goes back or hides menus, click on menu items too
+							if (stextflag) {
+								STextEnter();
+							} else if (questlog) {
+								QuestlogEnter();
+							} else {
+								control_type_message();
 							}
-							v4 = MouseX;
-							goto LABEL_101;*/
+							return;
 						}
 					}
 				}
@@ -1495,6 +1473,7 @@ void __fastcall PressChar(int vkey)
 			case 'Z':
 			case 'z':
 				// JAKE: Spacebar used to go back, now Z goes back.
+				gamemenu_previous(); // back out of speech menus too
 				if (!chrflag) {
 					if (!invflag) {
 					LABEL_106:
@@ -2000,7 +1979,7 @@ void __cdecl game_logic()
 
 			// JAKE: PLRCTRLS
 			// check for monsters first, then towners or objs.
-			if (!checkMonstersNearby(false, false)) {
+			if (!checkMonstersNearby(false)) {
 				pcursmonst = -1;
 				checkTownersNearby(false);
 				checkItemsNearby(false);

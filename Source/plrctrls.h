@@ -5,7 +5,7 @@
 void __fastcall checkTownersNearby(bool interact);
 void __fastcall checkItemsNearby(bool interact);
 void __fastcall keyboardExpension();
-bool __fastcall checkMonstersNearby(bool attack, bool castspell);
+bool __fastcall checkMonstersNearby(bool attack);
 extern bool newCurHidden;
 void invMove(int key);
 extern const InvXY InvRect[73]; // wasn't made public, so I'll add this here from inv.cpp
