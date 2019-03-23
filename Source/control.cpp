@@ -2521,7 +2521,7 @@ void __fastcall control_drop_gold(char vkey)
 	}
 	memset(v6, 0, sizeof(v6));
 	_itoa(dropGoldValue, v6, 10);
-	if (v1 != VK_RETURN) {
+	if (v1 != VK_RETURN && v1 != VK_SPACE) {
 		if (v1 == VK_ESCAPE) {
 			dropGoldFlag = 0;
 			dropGoldValue = 0;
