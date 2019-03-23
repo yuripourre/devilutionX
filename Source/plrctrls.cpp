@@ -21,6 +21,8 @@ closestMonster checkNearbyObjs(int x, int y, int diff)
 
 	if (diff_x <= diff && diff_y <= diff) {
 		closestMonster cm = { diff_x, diff_y };
+		//sprintf(tempstr, "N-DIFF X:%i Y:%i", diff_x, diff_y);
+		//NetSendCmdString(1 << myplr, tempstr);
 		return cm;
 	}
 	return { -1, -1 };
@@ -31,14 +33,12 @@ void __fastcall checkItemsNearby(bool interact)
 	for (int i = 0; i < MAXITEMS; i++) {
 		if (checkNearbyObjs(item[i]._ix, item[i]._iy, 1).x != -1 && item[i]._iSelFlag > 0) {
 			pcursitem = i;
-			//if (newCurHidden) {
 			if (dItem[item[i]._ix][item[i]._iy] <= 0)
 				continue;
-			//SetCursorPos(item[i]._ix, item[i]._iy);
-			//}
-			//sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
-			//NetSendCmdString(1 << myplr, tempstr);
 			if (interact) {
+				sprintf(tempstr, "FOUND NEARBY ITEM AT X:%i Y:%i SEL:%i", item[i]._ix, item[i]._iy, item[i]._iSelFlag);
+				NetSendCmdString(1 << myplr, tempstr);
+				SetCursorPos(item[i]._ix, item[i]._iy);
 				LeftMouseCmd(false);
 			}
 			return; // item nearby, don't find objects
@@ -78,18 +78,18 @@ bool __fastcall checkMonstersNearby(bool attack, bool castspell)
 	int closest = 0;                         // monster ID who is closest
 	closestMonster objDistLast = { 99, 99 }; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
-		int d_monster = dMonster[monster[i]._mx][monster[i]._my + 1];
-		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // is monster alive and not hiding
+		int d_monster = dMonster[monster[i]._mx][monster[i]._my];
+		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // is monster is hidding or dead, skip
 			continue;
-		//if (d_monster && dFlags[monster[i]._mx][monster[i]._my + 1] & DFLAG_LIT) { // is monster visible
-		//	if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
-		closestMonster objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
-		if (objDist.x > -1 && objDist.x < objDistLast.x && objDist.y < objDistLast.y) {
-			closest = i;
-			objDistLast = objDist;
+		if (d_monster && dFlags[monster[i]._mx][monster[i]._my] & DFLAG_LIT) { // is monster visible
+			if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
+				closestMonster objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
+				if (objDist.x > -1 && objDist.x <= objDistLast.x && objDist.y <= objDistLast.y) {
+					closest = i;
+					objDistLast = objDist;
+				}
+			}
 		}
-		//	}
-		//}
 	}
 	if (closest > 0 && (attack || castspell)) { // did we find a monster, and want to attack it?
 		pcursmonst = closest;
@@ -127,7 +127,7 @@ void HideCursor()
 
 static DWORD invmove;
 DWORD ticks;
-int slot = 25;
+int slot = SLOTXY_INV_FIRST;
 // move the cursor around in our inventory
 // if mouse coords are at SLOTXY_CHEST_LAST, consider this center of equipment
 // small inventory squares are 29x29 (roughly)
@@ -308,8 +308,8 @@ void __fastcall keyboardExpension()
 			}
 		} else {
 			HideCursor();
-			checkTownersNearby(true);
-			checkMonstersNearby(true, false);
+			if (!checkMonstersNearby(true, false))
+				checkTownersNearby(true);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
 		if (!invflag) {
