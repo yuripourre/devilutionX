@@ -128,6 +128,47 @@ void HideCursor()
 	newCurHidden = true;
 }
 
+void attrIncBtnSnap(int key)
+{
+	if (invflag || spselflag || !chrflag)
+		return;
+
+	if (chrbtnactive && !plr[myplr]._pStatPts)
+		return;
+
+	if (ticks - invmove < 80) {
+		return;
+	}
+	invmove = ticks;
+
+	// first, find our cursor location
+	int slot = 0;
+	for (int i = 0; i < 4; i++) {
+		// 0 = x, 1 = y, 2 = width, 3 = height
+		if (MouseX >= attribute_inc_rects[i][0]
+			&& MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
+			&& MouseY >= attribute_inc_rects[i][1]
+			&& MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
+			slot = i;
+			break;
+		}
+	}
+
+	// set future location up or down
+	if (key == VK_UP) {
+		if (slot > 0)
+			slot--;
+	} else if (key == VK_DOWN) {
+		if (slot < 3)
+			slot++;
+	}
+
+	// move cursor to our new location
+	int x = attribute_inc_rects[slot][0] + (attribute_inc_rects[slot][2] / 2);
+	int y = attribute_inc_rects[slot][1] + (attribute_inc_rects[slot][3] / 2);
+	SetCursorPos(x, y);
+}
+
 // move the cursor around in our inventory
 // if mouse coords are at SLOTXY_CHEST_LAST, consider this center of equipment
 // small inventory squares are 29x29 (roughly)
@@ -296,6 +337,8 @@ void hotSpellMove(int key)
 	if (!spselflag)
 		return;
 
+	HideCursor();
+
 	if (ticks - invmove < 80) {
 		return;
 	}
@@ -371,6 +414,7 @@ void __fastcall keyboardExpension()
 {
 	static DWORD opentimer;
 	static DWORD clickinvtimer;
+	static DWORD statuptimer;
 	ticks = GetTickCount();
 
 	if (stextflag || questlog || helpflag || talkflag || qtextflag)
@@ -385,6 +429,20 @@ void __fastcall keyboardExpension()
 			}
 		} else if (spselflag) {
 			SetSpell();
+		} else if (chrflag) {
+			if (ticks - statuptimer >= 400) {
+				statuptimer = ticks;
+				for (int i = 0; i < 4; i++) {
+					if (MouseX >= attribute_inc_rects[i][0]
+						&& MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
+						&& MouseY >= attribute_inc_rects[i][1]
+						&& MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
+						chrbtn[i] = 1;
+						chrbtnactive = TRUE;
+						ReleaseChrBtns();
+					}
+				}
+			}
 		} else
 			{
 			HideCursor();
@@ -416,6 +474,7 @@ void __fastcall keyboardExpension()
 	} else if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) {
 		invMove(VK_UP);
 		hotSpellMove(VK_UP);
+		attrIncBtnSnap(VK_UP);
 		walkInDir(WALK_N);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) {
 		invMove(VK_RIGHT);
@@ -424,6 +483,7 @@ void __fastcall keyboardExpension()
 	} else if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) {
 		invMove(VK_DOWN);
 		hotSpellMove(VK_DOWN);
+		attrIncBtnSnap(VK_DOWN);
 		walkInDir(WALK_S);
 	} else if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) {
 		invMove(VK_LEFT);

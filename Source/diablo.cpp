@@ -1395,9 +1395,21 @@ void __fastcall PressChar(int vkey)
 					questlog = 0;
 					v7 = chrflag == 0;
 					chrflag = chrflag == 0;
-					if (!v7 || invflag)
-						goto LABEL_18;
-					goto LABEL_24;
+
+					// JAKE: Also put our cursor on attribute up btn
+					if (!chrbtnactive && plr[myplr]._pStatPts) {
+						if (newCurHidden) {
+							SetCursor_(CURSOR_HAND);
+							newCurHidden = false;
+						}
+						int x = attribute_inc_rects[0][0] + (attribute_inc_rects[0][2] / 2);
+						int y = attribute_inc_rects[0][1] + (attribute_inc_rects[0][3] / 2);
+						SetCursorPos(x, y);
+					} else { // code below is for moving cursor over when you open char info window
+						if (!v7 || invflag)
+							goto LABEL_18;
+						goto LABEL_24;
+					}
 				}
 				return;
 			case 'F':
@@ -1457,7 +1469,6 @@ void __fastcall PressChar(int vkey)
 				return;
 			case 'H': // JAKE: Changed, used to be 'S' and 's'
 			case 'h':
-				HideCursor();
 				//SetAllSpellsCheat(); // for debugging
 				if (!stextflag) {
 					invflag = 0;
