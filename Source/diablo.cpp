@@ -423,9 +423,9 @@ void __fastcall diablo_parse_flags(char *args)
 			case 'v': // draw yellow debug tiles
 				visiondebug = 1;
 				break;
-			case 'w': // rest of the cheats, some only in town
-				debug_mode_key_w = 1;
-				break;
+			//case 'w': // rest of the cheats, some only in town // JAKE: Disabled
+			//	debug_mode_key_w = 1;
+			//	break;
 			//case 'x': // JAKE: Removed for spell casting
 			//	fullscreen = FALSE;
 			//	break;
@@ -986,7 +986,7 @@ void __cdecl LeftMouseUp()
 
 void __cdecl RightMouseDown()
 {
-	if (!gmenu_exception() && sgnTimeoutCurs == CURSOR_NONE && PauseMode != 2 && !plr[myplr]._pInvincible) {
+	if (!gmenu_exception() && /*sgnTimeoutCurs == CURSOR_NONE &&*/ PauseMode != 2 && !plr[myplr]._pInvincible) {
 		if (doomflag) {
 			doom_close();
 		} else if (!stextflag) {
@@ -1979,12 +1979,14 @@ void __cdecl game_logic()
 
 			// JAKE: PLRCTRLS
 			// check for monsters first, then towners or objs.
-			if (!checkMonstersNearby(false)) {
-				pcursmonst = -1;
-				checkTownersNearby(false);
-				checkItemsNearby(false);
-			} else {
-				pcursitem = -1;
+			if (pcurs <= 0) { // cursor should be missing
+				if (!checkMonstersNearby(false)) {
+					pcursmonst = -1;
+					checkTownersNearby(false);
+					checkItemsNearby(false);
+				} else {
+					pcursitem = -1;
+				}
 			}
 			keyboardExpension();
 			//

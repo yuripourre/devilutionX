@@ -271,26 +271,26 @@ void __fastcall DrawSpellCel(int xp, int yp, BYTE *Trans, int nCel, int w)
 	src = &Trans[pFrameTable[0]];
 	end = &src[pFrameTable[1] - pFrameTable[0]];
 
-	for(; src != end; dst -= 768 + w) {
-		for(i = w; i;) {
+	for (; src != end; dst -= 768 + w) {
+		for (i = w; i;) {
 			width = *src++;
-			if(!(width & 0x80)) {
+			if (!(width & 0x80)) {
 				i -= width;
 				// asm_cel_light_edge(width, tbl, dst, src);
-				if(width & 1) {
+				if (width & 1) {
 					dst[0] = tbl[src[0]];
 					src++;
 					dst++;
 				}
 				width >>= 1;
-				if(width & 1) {
+				if (width & 1) {
 					dst[0] = tbl[src[0]];
 					dst[1] = tbl[src[1]];
 					src += 2;
 					dst += 2;
 				}
 				width >>= 1;
-				for(; width; width--) {
+				for (; width; width--) {
 					dst[0] = tbl[src[0]];
 					dst[1] = tbl[src[1]];
 					dst[2] = tbl[src[2]];
@@ -398,7 +398,7 @@ void __cdecl DrawSpell()
 		DrawSpellCel(629, 631, (BYTE *)pSpellCels, (char)SpellITbl[v3], 56);
 }
 
-void __cdecl DrawSpellList()
+void __cdecl DrawSpellList() // draw speed spells
 {
 	int v0;               // esi
 	signed int v1;        // edi
@@ -434,6 +434,7 @@ void __cdecl DrawSpellList()
 	v0 = myplr;
 	v1 = RSPLTYPE_SKILL;
 	v24 = 0;
+
 	do {
 		switch (v1) {
 		case RSPLTYPE_SKILL:
@@ -482,7 +483,8 @@ void __cdecl DrawSpellList()
 			if (!currlevel && !*v20)
 				SetSpellTrans(RSPLTYPE_INVALID);
 			DrawSpellCel(v17, xp, (BYTE *)pSpellCels, (char)SpellITbl[v4], 56);
-			if (MouseX >= v17 - 64 && MouseX < v17 - 64 + 56 && MouseY >= v22 && MouseY < v22 + 56) {
+			if (MouseX >= v17 - 64 && MouseX < v17 - 64 + 56 && MouseY >= v22 && MouseY < v22 + 56)
+			{
 				pSpell = v4;
 				pSplType = v1;
 				DrawSpellCel(v17, xp, (BYTE *)pSpellCels, yp, 56);
@@ -1135,19 +1137,22 @@ void __cdecl DrawCtrlPan()
 }
 // 484368: using guessed type int FriendlyMode;
 // 4B8A7C: using guessed type int numpanbtns;
-
+int tmpcnt = 0; // added
 void __cdecl DoSpeedBook()
 {
 	unsigned __int64 spells, spell;
-	int xo, yo, X, Y, i, j;
+	int xo, yo, X, Y, i, j, ssx, ssy;
 
 	spselflag = 1;
+	speedspellcount = 0;
 	xo = 636;
 	yo = 495;
 	X = 600;
 	Y = 307;
+	ssx = 600;
+	ssy = 307;
 	if (plr[myplr]._pRSpell != -1) {
-		for (i = 0; i < 4; i++) { // 4 rows
+		for (i = 0; i < 4; i++) {
 			switch (i) {
 			case RSPLTYPE_SKILL:
 				spells = plr[myplr]._pAblSpells;
@@ -1168,7 +1173,9 @@ void __cdecl DoSpeedBook()
 					if (j == plr[myplr]._pRSpell && i == plr[myplr]._pRSplType) {
 						X = xo - 36;
 						Y = yo - 188;
-					}
+					} 
+					ssx = xo - 36; // j
+					ssy = yo - 188; // j
 					xo -= 56;
 					if (xo == 20) {
 						xo = 636;
@@ -1183,6 +1190,14 @@ void __cdecl DoSpeedBook()
 				xo = 636;
 				yo -= 56;
 			}
+			// Jake: here's speedspell images. Store them into our array
+			if (speedspellscoords[tmpcnt - 1].x != ssx && speedspellscoords[tmpcnt - 1].y != ssy) { // prevent repeats
+				speedspellscoords[speedspellcount].x = ssx;
+				speedspellscoords[speedspellcount].y = ssy;
+				speedspellcount++;
+			}
+			tmpcnt++;
+			//
 		}
 	}
 

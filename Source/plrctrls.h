@@ -8,6 +8,12 @@ void __fastcall keyboardExpension();
 bool __fastcall checkMonstersNearby(bool attack);
 extern bool newCurHidden;
 void invMove(int key);
+typedef struct coords {
+	int x;
+	int y;
+} coords;
+extern coords speedspellscoords[50];
+extern int speedspellcount;
 extern const InvXY InvRect[73]; // wasn't made public, so I'll add this here from inv.cpp
 
 #define INV_TOP 240;

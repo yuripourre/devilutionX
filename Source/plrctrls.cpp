@@ -11,20 +11,18 @@ static DWORD attacktick;
 static DWORD invmove;
 DWORD ticks;
 int slot = SLOTXY_INV_FIRST;
-
-struct closestMonster {
-	int x;
-	int y;
-};
+int spbslot = 0;
+coords speedspellscoords[50];
+int speedspellcount = 0;
 
 // 0 = not near, >0 = distance related player 1 coordinates
-closestMonster checkNearbyObjs(int x, int y, int diff)
+coords checkNearbyObjs(int x, int y, int diff)
 {
 	int diff_x = abs(plr[myplr]._px - x);
 	int diff_y = abs(plr[myplr]._py - y);
 
 	if (diff_x <= diff && diff_y <= diff) {
-		closestMonster cm = { diff_x, diff_y };
+		coords cm = { diff_x, diff_y };
 		//sprintf(tempstr, "N-DIFF X:%i Y:%i", diff_x, diff_y);
 		//NetSendCmdString(1 << myplr, tempstr);
 		return cm;
@@ -80,14 +78,14 @@ void __fastcall checkTownersNearby(bool interact)
 bool __fastcall checkMonstersNearby(bool attack)
 {
 	int closest = 0;                         // monster ID who is closest
-	closestMonster objDistLast = { 99, 99 }; // previous obj distance
+	coords objDistLast = { 99, 99 }; // previous obj distance
 	for (int i = 0; i < MAXMONSTERS; i++) {
 		int d_monster = dMonster[monster[i]._mx][monster[i]._my];
 		if (monster[i]._mFlags & MFLAG_HIDDEN || monster[i]._mhitpoints <= 0) // monster is hiding or dead, skip
 			continue;
 		if (d_monster && dFlags[monster[i]._mx][monster[i]._my] & DFLAG_LIT) { // is monster visible
 			if (monster[i].MData->mSelFlag & 1 || monster[i].MData->mSelFlag & 2 || monster[i].MData->mSelFlag & 3 || monster[i].MData->mSelFlag & 4) { // is monster selectable
-				closestMonster objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
+				coords objDist = checkNearbyObjs(monster[i]._mx, monster[i]._my, 6);
 				if (objDist.x > -1 && objDist.x <= objDistLast.x && objDist.y <= objDistLast.y) {
 					closest = i;
 					objDistLast = objDist;
@@ -280,6 +278,47 @@ void invMove(int key)
 		SetCursorPos(x, y);
 }
 
+void hotSpellMove(int key)
+{
+	int x = 0;
+	int y = 0;
+	if (!spselflag)
+		return;
+
+	if (ticks - invmove < 80) {
+		return;
+	}
+	invmove = ticks;
+
+	for (int r = 0; r < speedspellcount; r++) { // speedbook cells are 56x56
+		if (MouseX >= speedspellscoords[r].x - 28 && MouseX < speedspellscoords[r].x + (28) && MouseY >= speedspellscoords[r].y - (28) && MouseY < speedspellscoords[r].y + 28) {
+			spbslot = r;
+			//sprintf(tempstr, "IN HOT SPELL CELL NUM:%i", r);
+			//NetSendCmdString(1 << myplr, tempstr);
+			break;
+		}
+	}
+
+	if (key == VK_UP) {
+
+	} else if (key == VK_DOWN) {
+
+	} else if (key == VK_LEFT) {
+		if (spbslot < speedspellcount)
+			spbslot++;
+		x = speedspellscoords[spbslot].x;
+		y = MouseY;
+	} else if (key == VK_RIGHT) {
+		if (spbslot > 0)
+			spbslot--;
+		x = speedspellscoords[spbslot].x;
+		y = MouseY;
+	}
+
+	if (x > 0 && y > 0)
+		SetCursorPos(x, y);
+}
+
 // walk in the direction specified
 void walkInDir(int dir)
 {
@@ -322,7 +361,10 @@ void __fastcall keyboardExpension()
 		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
-		RightMouseDown();
+		if (ticks - opentimer >= 400) {
+			opentimer = ticks;
+			RightMouseDown();
+		}
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
 		walkInDir(WALK_SE);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x44) & 0x8000) {
@@ -333,15 +375,19 @@ void __fastcall keyboardExpension()
 		walkInDir(WALK_NW);
 	} else if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000) {
 		invMove(VK_UP);
+		hotSpellMove(VK_UP);
 		walkInDir(WALK_N);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000) {
 		invMove(VK_RIGHT);
+		hotSpellMove(VK_RIGHT);
 		walkInDir(WALK_E);
 	} else if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x53) & 0x8000) {
 		invMove(VK_DOWN);
+		hotSpellMove(VK_DOWN);
 		walkInDir(WALK_S);
 	} else if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState(0x41) & 0x8000) {
 		invMove(VK_LEFT);
+		hotSpellMove(VK_LEFT);
 		walkInDir(WALK_W);
 	}
 }
