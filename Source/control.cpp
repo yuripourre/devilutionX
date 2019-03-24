@@ -1137,7 +1137,6 @@ void __cdecl DrawCtrlPan()
 }
 // 484368: using guessed type int FriendlyMode;
 // 4B8A7C: using guessed type int numpanbtns;
-int tmpcnt = 0; // added
 void __cdecl DoSpeedBook()
 {
 	unsigned __int64 spells, spell;
@@ -1173,9 +1172,14 @@ void __cdecl DoSpeedBook()
 					if (j == plr[myplr]._pRSpell && i == plr[myplr]._pRSplType) {
 						X = xo - 36;
 						Y = yo - 188;
-					} 
-					ssx = xo - 36; // j
-					ssy = yo - 188; // j
+					}
+					// JAKE: here's speedspell images. Store them into our array
+					ssx = xo - 36;
+					ssy = yo - 188;
+					speedspellscoords[speedspellcount].x = ssx;
+					speedspellscoords[speedspellcount].y = ssy;
+					speedspellcount++;
+					//
 					xo -= 56;
 					if (xo == 20) {
 						xo = 636;
@@ -1190,14 +1194,6 @@ void __cdecl DoSpeedBook()
 				xo = 636;
 				yo -= 56;
 			}
-			// Jake: here's speedspell images. Store them into our array
-			if (speedspellscoords[tmpcnt - 1].x != ssx && speedspellscoords[tmpcnt - 1].y != ssy) { // prevent repeats
-				speedspellscoords[speedspellcount].x = ssx;
-				speedspellscoords[speedspellcount].y = ssy;
-				speedspellcount++;
-			}
-			tmpcnt++;
-			//
 		}
 	}
 

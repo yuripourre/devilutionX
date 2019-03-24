@@ -8,6 +8,7 @@ void __fastcall keyboardExpension();
 bool __fastcall checkMonstersNearby(bool attack);
 extern bool newCurHidden;
 void invMove(int key);
+void HideCursor();
 typedef struct coords {
 	int x;
 	int y;

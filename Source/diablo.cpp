@@ -423,9 +423,11 @@ void __fastcall diablo_parse_flags(char *args)
 			case 'v': // draw yellow debug tiles
 				visiondebug = 1;
 				break;
-			//case 'w': // rest of the cheats, some only in town // JAKE: Disabled
-			//	debug_mode_key_w = 1;
-			//	break;
+			case ';': // rest of the cheats, some only in town // JAKE: Changed from w
+				sprintf(tempstr, "Debug W Mode Enabled");
+				NetSendCmdString(1 << myplr, tempstr);
+				debug_mode_key_w = 1;
+				break;
 			//case 'x': // JAKE: Removed for spell casting
 			//	fullscreen = FALSE;
 			//	break;
@@ -1455,6 +1457,8 @@ void __fastcall PressChar(int vkey)
 				return;
 			case 'H': // JAKE: Changed, used to be 'S' and 's'
 			case 'h':
+				HideCursor();
+				//SetAllSpellsCheat(); // for debugging
 				if (!stextflag) {
 					invflag = 0;
 					if (spselflag)
@@ -1527,8 +1531,11 @@ void __fastcall PressChar(int vkey)
 				}
 				return;
 			case ':':
-				if (!currlevel && debug_mode_key_w)
+				if (!currlevel && debug_mode_key_w) {
+					sprintf(tempstr, "CHEAT: Giving all spells");
+					NetSendCmdString(1 << myplr, tempstr);
 					SetAllSpellsCheat();
+				}
 				return;
 			//case '[': // JAKE: This was the old code. This is pointless.
 			//	if (!currlevel && debug_mode_key_w)
