@@ -65,13 +65,13 @@ void CheckForController()
 {
 	Player1 = new CXBOXController(1);
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_A, VK_SPACE));
-	//Player1->Buttons.insert(std::pair<WORD, int>(VK_SPACE, XINPUT_GAMEPAD_B)); // swap hot spells
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_B, 0x49)); // I key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_X, VK_RETURN));
-	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_Y, 0x58)); // x key
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_Y, 0x58)); // X key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_BACK, VK_TAB));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_START, VK_ESCAPE));
-	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_LEFT_SHOULDER, 0x48));
-	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_RIGHT_SHOULDER, VK_TAB));
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_LEFT_SHOULDER, 0x48)); // H key
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_RIGHT_SHOULDER, 0x43)); // C key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_UP, VK_UP));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_DOWN, VK_DOWN));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_LEFT, VK_LEFT));
@@ -80,22 +80,21 @@ void CheckForController()
 	while (true) {
 		if (Player1->IsConnected()) {
 			for (auto button : Player1->Buttons) {
-				if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) {
+				if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) { // currently pressing
 					WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
 					keybd_event(mapping, 0, 0, 0);
 				}
 
-				if (previous.dwPacketNumber < Player1->GetState().dwPacketNumber) {
-					if ((Player1->GetState().Gamepad.wButtons & button.first) == 0
-					    && (previous.Gamepad.wButtons & button.first) != 0) {
+				if (previous.dwPacketNumber < Player1->GetState().dwPacketNumber) { // was pressing, recently released the button
+					if ((Player1->GetState().Gamepad.wButtons & button.first) == 0 && (previous.Gamepad.wButtons & button.first) != 0) {
 						WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
 						keybd_event(mapping, 0, KEYEVENTF_KEYUP, 0);
 					}
 				}
 			}
 		} else {
-			sprintf(tempstr, "PLAYER 1: CONTROLLER DISCONNECTED");
-			NetSendCmdString(1 << myplr, tempstr);
+			//sprintf(tempstr, "PLAYER 1: CONTROLLER DISCONNECTED");
+			//NetSendCmdString(1 << myplr, tempstr);
 			//break;
 		}
 	}
