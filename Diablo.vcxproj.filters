@@ -232,6 +232,9 @@
     <ClCompile Include="Source\plrctrls.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\joystick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Diablo.ico">
@@ -467,6 +470,9 @@
       <Filter>PKWare</Filter>
     </ClInclude>
     <ClInclude Include="Source\plrctrls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\joystick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

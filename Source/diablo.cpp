@@ -1,6 +1,7 @@
 //HEADER_GOES_HERE
 
 #include "../types.h"
+#include <thread> // JAKE: For controllers
 
 HWND ghMainWnd;
 int glMid1Seed[NUMLEVELS];
@@ -258,6 +259,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	int nData;
 	char szFileName[MAX_PATH];
 	BOOL bNoEvent;
+
+	std::thread first(CheckForController);
 
 	hInst = hInstance;
 #ifndef DEBUGGER

@@ -134,6 +134,7 @@ extern "C" {
 #include "Source/wave.h"
 #include "Source/render.h" // linked last, likely .s/.asm
 #include "Source/plrctrls.h"
+#include "Source/joystick.h"
 #ifdef __cplusplus
 }
 #endif

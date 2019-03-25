@@ -146,9 +146,9 @@ void attrIncBtnSnap(int key)
 	for (int i = 0; i < 4; i++) {
 		// 0 = x, 1 = y, 2 = width, 3 = height
 		if (MouseX >= attribute_inc_rects[i][0]
-			&& MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
-			&& MouseY >= attribute_inc_rects[i][1]
-			&& MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
+		    && MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
+		    && MouseY >= attribute_inc_rects[i][1]
+		    && MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
 			slot = i;
 			break;
 		}
@@ -434,17 +434,16 @@ void __fastcall keyboardExpension()
 				statuptimer = ticks;
 				for (int i = 0; i < 4; i++) {
 					if (MouseX >= attribute_inc_rects[i][0]
-						&& MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
-						&& MouseY >= attribute_inc_rects[i][1]
-						&& MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
+					    && MouseX <= attribute_inc_rects[i][0] + attribute_inc_rects[i][2]
+					    && MouseY >= attribute_inc_rects[i][1]
+					    && MouseY <= attribute_inc_rects[i][3] + attribute_inc_rects[i][1]) {
 						chrbtn[i] = 1;
 						chrbtnactive = TRUE;
 						ReleaseChrBtns();
 					}
 				}
 			}
-		} else
-			{
+		} else {
 			HideCursor();
 			if (!checkMonstersNearby(true))
 				checkTownersNearby(true);
