@@ -2850,10 +2850,15 @@ int __fastcall control_presskeys(int a1)
 {
 	signed int v1; // eax
 	char v2;       // cl
+	
+
+	sprintf(tempstr, "moving talk up down");
+	NetSendCmdString(1 << myplr, tempstr);
 
 	if (gbMaxPlayers != 1 && talkflag) {
 		switch (a1) {
 		case VK_SPACE:
+			control_press_enter();
 			return 1;
 		case VK_ESCAPE:
 			control_reset_talk();

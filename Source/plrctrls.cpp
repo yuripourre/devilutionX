@@ -410,6 +410,24 @@ void walkInDir(int dir)
 	plr[myplr].walkpath[0] = dir;
 }
 
+void backOutOfMenus()
+{
+	gamemenu_previous(); // back out of speech menus too
+	helpflag = 0;
+	invflag = 0;
+	chrflag = 0;
+	sbookflag = 0;
+	spselflag = 0;
+	if (qtextflag) {
+		qtextflag = FALSE;
+		sfx_stop();
+	}
+	questlog = 0;
+	msgdelay = 0;
+	gamemenu_off();
+	doom_close();
+}
+
 void __fastcall keyboardExpension()
 {
 	static DWORD opentimer;
@@ -459,8 +477,9 @@ void __fastcall keyboardExpension()
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
 		HideCursor();
 		if (ticks - opentimer >= 400) {
-			opentimer = ticks;
+			backOutOfMenus();
 			RightMouseDown();
+			opentimer = ticks;
 		}
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
 		walkInDir(WALK_SE);

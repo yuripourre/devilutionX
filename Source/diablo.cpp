@@ -1065,6 +1065,8 @@ void __fastcall PressKey(int vkey)
 	int v3;        // ecx
 	signed int v4; // eax
 
+	ticks = GetTickCount();
+
 	v1 = vkey;
 	if (!gmenu_presskeys(vkey) && !control_presskeys(v1)) {
 		if (!deathflag)
@@ -1179,6 +1181,10 @@ void __fastcall PressKey(int vkey)
 							v3 = 3;
 							goto LABEL_59;
 						case VK_UP:
+							if (ticks - menuopenslow < 300) {
+								return;
+							}
+							menuopenslow = ticks;
 							if (stextflag) {
 								STextUp();
 							} else if (questlog) {
@@ -1191,6 +1197,10 @@ void __fastcall PressKey(int vkey)
 							}
 							return;
 						case VK_DOWN:
+							if (ticks - menuopenslow < 300) {
+								return;
+							}
+							menuopenslow = ticks;
 							if (stextflag) {
 								STextDown();
 							} else if (questlog) {
@@ -1232,6 +1242,10 @@ void __fastcall PressKey(int vkey)
 							DoAutoMap();
 							return;
 						case VK_SPACE: // JAKE: No longer goes back or hides menus, click on menu items too
+							if (ticks - menuopenslow < 300) {
+								return;
+							}
+							menuopenslow = ticks;
 							if (stextflag) {
 								STextEnter();
 							} else if (questlog) {
