@@ -260,8 +260,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	char szFileName[MAX_PATH];
 	BOOL bNoEvent;
 
-	std::thread first(CheckForController);
-
 	hInst = hInstance;
 #ifndef DEBUGGER
 	diablo_reload_process(hInstance);
@@ -291,6 +289,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		init_create_window(nCmdShow);
 		sound_init();
 		UiInitialize();
+
+		std::thread first(CheckForController);
 
 #ifdef _DEBUG
 		if (showintrodebug)
@@ -1055,6 +1055,9 @@ void __fastcall ReleaseKey(int vkey)
 		CaptureScreen();
 }
 
+static DWORD menuopenslow;
+extern DWORD ticks;
+
 void __fastcall PressKey(int vkey)
 {
 	int v1;        // esi
@@ -1220,6 +1223,12 @@ void __fastcall PressKey(int vkey)
 							}
 							return;
 						case VK_TAB:
+							// JAKE: Slow down
+							if (ticks - menuopenslow < 300) {
+								return;
+							}
+							menuopenslow = ticks;
+
 							DoAutoMap();
 							return;
 						case VK_SPACE: // JAKE: No longer goes back or hides menus, click on menu items too
@@ -1265,6 +1274,7 @@ void __cdecl diablo_pause_game()
 // 525740: using guessed type int PauseMode;
 // 679660: using guessed type char gbMaxPlayers;
 
+// JAKE: Added some timers to slow down the menus a bit
 void __fastcall PressChar(int vkey)
 {
 	int v1;  // ebx
@@ -1394,6 +1404,12 @@ void __fastcall PressChar(int vkey)
 				return;
 			case 'C':
 			case 'c':
+				// JAKE: Slow down
+				if (ticks - menuopenslow < 300) {
+					return;
+				}
+				menuopenslow = ticks;
+
 				if (!stextflag) {
 					questlog = 0;
 					v7 = chrflag == 0;
@@ -1427,6 +1443,13 @@ void __fastcall PressChar(int vkey)
 			case 'i':
 				if (stextflag)
 					return;
+
+				// JAKE: Slow down
+				if (ticks - menuopenslow < 300) {
+					return;
+				}
+				menuopenslow = ticks;
+
 				sbookflag = 0;
 				v4 = invflag == 0;
 				invflag = invflag == 0;
@@ -1473,6 +1496,13 @@ void __fastcall PressChar(int vkey)
 			case 'H': // JAKE: Changed, used to be 'S' and 's'
 			case 'h':
 				//SetAllSpellsCheat(); // for debugging
+
+				// JAKE: Slow down
+				if (ticks - menuopenslow < 300) {
+					return;
+				}
+				menuopenslow = ticks;
+
 				if (!stextflag) {
 					invflag = 0;
 					if (spselflag)

@@ -1,7 +1,9 @@
 #include "../types.h"
 #include <Xinput.h>
+#include <list>
 #include <map>
 #include <string>
+#include <algorithm>
 #pragma comment(lib, "xinput.lib")
 
 class CXBOXController {
@@ -17,19 +19,14 @@ public:
 	std::map<WORD, int> Buttons;
 };
 
-
 CXBOXController::CXBOXController(int playerNumber)
 {
-	// Set the Controller Number
 	_controllerNum = playerNumber - 1;
 }
 
 XINPUT_STATE CXBOXController::GetState()
 {
-	// Zeroise the state
 	ZeroMemory(&_controllerState, sizeof(XINPUT_STATE));
-
-	// Get the state
 	XInputGetState(_controllerNum, &_controllerState);
 
 	return _controllerState;
@@ -37,10 +34,7 @@ XINPUT_STATE CXBOXController::GetState()
 
 bool CXBOXController::IsConnected()
 {
-	// Zeroise the state
 	ZeroMemory(&_controllerState, sizeof(XINPUT_STATE));
-
-	// Get the state
 	DWORD Result = XInputGetState(_controllerNum, &_controllerState);
 
 	if (Result == ERROR_SUCCESS) {
@@ -61,6 +55,7 @@ void CXBOXController::Vibrate(int leftVal, int rightVal)
 
 CXBOXController *Player1;
 XINPUT_STATE previous;
+bool releaseController = false;
 void CheckForController()
 {
 	Player1 = new CXBOXController(1);
@@ -70,32 +65,40 @@ void CheckForController()
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_Y, 0x58)); // X key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_BACK, VK_TAB));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_START, VK_ESCAPE));
-	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_LEFT_SHOULDER, 0x48)); // H key
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_LEFT_SHOULDER, 0x48));  // H key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_RIGHT_SHOULDER, 0x43)); // C key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_UP, VK_UP));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_DOWN, VK_DOWN));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_LEFT, VK_LEFT));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_RIGHT, VK_RIGHT));
 
-	while (true) {
-		if (Player1->IsConnected()) {
-			for (auto button : Player1->Buttons) {
-				if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) { // currently pressing
-					WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
-					keybd_event(mapping, 0, 0, 0);
-				}
+	std::list<WORD> heldBtns;
 
-				if (previous.dwPacketNumber < Player1->GetState().dwPacketNumber) { // was pressing, recently released the button
-					if ((Player1->GetState().Gamepad.wButtons & button.first) == 0 && (previous.Gamepad.wButtons & button.first) != 0) {
-						WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
-						keybd_event(mapping, 0, KEYEVENTF_KEYUP, 0);
-					}
-				}
+LABEL_14:
+	while (Player1->IsConnected()) {
+		releaseController = true;
+		for (auto button : Player1->Buttons) {
+			if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) { // currently pressing
+				WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
+				keybd_event(mapping, 0, 0, 0);
+				heldBtns.push_back(button.first);
 			}
-		} else {
-			//sprintf(tempstr, "PLAYER 1: CONTROLLER DISCONNECTED");
-			//NetSendCmdString(1 << myplr, tempstr);
-			//break;
+
+			bool found = (std::find(heldBtns.begin(), heldBtns.end(), button.first) != heldBtns.end());
+			if ((Player1->GetState().Gamepad.wButtons & button.first) == 0 && found) {
+				WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
+				keybd_event(mapping, 0, KEYEVENTF_KEYUP, 0);
+				heldBtns.remove(button.first);
+			}
 		}
 	}
+
+	if (releaseController) { // release all the keys
+		for (std::map<WORD, int>::iterator it = Player1->Buttons.begin(); it != Player1->Buttons.end(); ++it) {
+			keybd_event(it->first, 0, KEYEVENTF_KEYUP, 0);
+		}
+		releaseController = false;
+	}
+
+	goto LABEL_14; // try again
 }
