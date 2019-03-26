@@ -2834,7 +2834,7 @@ int __fastcall control_talk_last_key(int a1)
 	signed int v3; // eax
 
 	v1 = a1;
-	if (gbMaxPlayers == 1 || !talkflag || (unsigned int)a1 < VK_SPACE)
+	if (gbMaxPlayers == 1 || !talkflag || (unsigned int)a1 <= VK_SPACE)
 		return 0;
 	v3 = strlen(sgszTalkMsg);
 	if (v3 < 78) {
@@ -2852,8 +2852,8 @@ int __fastcall control_presskeys(int a1)
 	char v2;       // cl
 	
 
-	sprintf(tempstr, "moving talk up down");
-	NetSendCmdString(1 << myplr, tempstr);
+	//sprintf(tempstr, "moving talk up down");
+	//NetSendCmdString(1 << myplr, tempstr);
 
 	if (gbMaxPlayers != 1 && talkflag) {
 		switch (a1) {

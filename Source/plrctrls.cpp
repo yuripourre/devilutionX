@@ -15,6 +15,8 @@ int spbslot = 0;
 coords speedspellscoords[50];
 int speedspellcount = 0;
 int hsr[3] = { 0, 0, 0 }; // hot spell row counts
+DWORD talkwait;
+DWORD talktick;
 
 // 0 = not near, >0 = distance related player 1 coordinates
 coords checkNearbyObjs(int x, int y, int diff)
@@ -69,8 +71,9 @@ void __fastcall checkTownersNearby(bool interact)
 	for (int i = 0; i < 16; i++) {
 		if (checkNearbyObjs(towner[i]._tx, towner[i]._ty, 2).x != -1) {
 			pcursmonst = i;
-			if (interact)
+			if (interact) {
 				TalkToTowner(myplr, i);
+			}
 			break;
 		}
 	}
@@ -463,6 +466,11 @@ void __fastcall keyboardExpension()
 			}
 		} else {
 			HideCursor();
+			talktick = GetTickCount();
+			if (talktick - talkwait < 500) { // prevent re-entering talk after finished
+				return;
+			}
+			talkwait = talktick;
 			if (!checkMonstersNearby(true))
 				checkTownersNearby(true);
 		}

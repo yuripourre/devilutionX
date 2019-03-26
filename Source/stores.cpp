@@ -3570,6 +3570,9 @@ void __cdecl S_DrunkEnter()
 
 void __cdecl STextEnter()
 {
+	talktick = GetTickCount();
+	talkwait = talktick;
+
 	if (qtextflag) {
 		qtextflag = FALSE;
 		if (leveltype == DTYPE_TOWN)

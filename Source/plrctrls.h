@@ -17,6 +17,9 @@ extern coords speedspellscoords[50];
 extern int speedspellcount;
 extern const InvXY InvRect[73]; // wasn't made public, so I'll add this here from inv.cpp
 
+extern DWORD talkwait;
+extern DWORD talktick;
+
 #define INV_TOP 240;
 #define INV_LEFT 350;
 #define INV_HEIGHT 320;
