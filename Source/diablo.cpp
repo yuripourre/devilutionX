@@ -856,7 +856,7 @@ BOOL __fastcall LeftMouseCmd(BOOL bShift)
 {
 	BOOL bNear;
 
-	if (!leveltype) { // in town
+	if (!leveltype) {                                // in town
 		if (pcursitem != -1 && pcurs <= CURSOR_HAND) // JAKE: allow no cursor as well
 			NetSendCmdLocParam1(TRUE, invflag ? CMD_GOTOGETITEM : CMD_GOTOAGETITEM, cursmx, cursmy, pcursitem);
 		if (pcursmonst != -1)
@@ -1473,7 +1473,7 @@ void __fastcall PressChar(int vkey)
 					newCurHidden = false;
 				}
 				SetCursorPos((InvRect[25].X + (INV_SLOT_SIZE_PX / 2)), (InvRect[25].Y - (INV_SLOT_SIZE_PX / 2))); // inv cells are 29x29
-				return;                 // don't do the other cursor move stuff
+				return;                                                                                           // don't do the other cursor move stuff
 				//
 				if (!v4 || chrflag) {
 				LABEL_24:
@@ -1532,138 +1532,143 @@ void __fastcall PressChar(int vkey)
 			case 'v':
 				NetSendCmdString(1 << myplr, gszProductName);
 				return;
-			case 'Z':
+			case 'Z': // JAKE: Added X key
 			case 'z':
-				// JAKE: Spacebar used to go back, now Z goes back.
-				gamemenu_previous(); // back out of speech menus too
-				if (!chrflag) {
-					if (!invflag) {
-					LABEL_106:
-						helpflag = 0;
-						invflag = 0;
-						chrflag = 0;
-						sbookflag = 0;
-						spselflag = 0;
-						if (qtextflag && leveltype == DTYPE_TOWN) {
-							qtextflag = FALSE;
-							sfx_stop();
-						}
-						questlog = 0;
-						automapflag = 0;
-						msgdelay = 0;
-						gamemenu_off();
-						doom_close(); //goto LABEL_110;
-						return;
-					}
-					v4 = MouseX;
-					if (MouseX >= 480 || MouseY >= 352) {
-					LABEL_101:
-						if (!invflag && chrflag && v4 > 160 && MouseY < 352)
-							SetCursorPos(v4 - 160, MouseY);
-						goto LABEL_106;
-					}
-					SetCursorPos(MouseX + 160, MouseY);
+			case 'x':
+			case 'X':
+			    // JAKE: Spacebar used to go back, now Z goes back.
+				if (ticks - menuopenslow < 300) {
+					return;
 				}
-				v4 = MouseX;
-				goto LABEL_101;
-				return;
-			case '[': // JAKE: Z key used to zoom in/out.
-			case '{':
-				zoomflag = zoomflag == 0;
-				return;
-#ifdef _DEBUG
-			case ')':
-			case '0':
-				if (debug_mode_key_inverted_v) {
-					if (arrowdebug > 2)
-						arrowdebug = 0;
-					if (!arrowdebug) {
-						plr[myplr]._pIFlags &= ~ISPL_FIRE_ARROWS;
-						plr[myplr]._pIFlags &= ~ISPL_LIGHT_ARROWS;
-					}
-					if (arrowdebug == 1)
-						plr[myplr]._pIFlags |= ISPL_FIRE_ARROWS;
-					if (arrowdebug == 2)
-						plr[myplr]._pIFlags |= ISPL_LIGHT_ARROWS;
-					arrowdebug++;
+				menuopenslow = ticks;
+			    gamemenu_previous(); // back out of speech menus too
+			    if (!chrflag) {
+				    if (!invflag) {
+					    LABEL_106:
+				helpflag = 0;
+				invflag = 0;
+				chrflag = 0;
+				sbookflag = 0;
+				spselflag = 0;
+				if (qtextflag && leveltype == DTYPE_TOWN) {
+					qtextflag = FALSE;
+					sfx_stop();
 				}
-				return;
-			case ':':
-				if (!currlevel && debug_mode_key_w) {
-					sprintf(tempstr, "CHEAT: Giving all spells");
-					NetSendCmdString(1 << myplr, tempstr);
-					SetAllSpellsCheat();
-				}
-				return;
-			//case '[': // JAKE: This was the old code. This is pointless.
-			//	if (!currlevel && debug_mode_key_w)
-			//		TakeGoldCheat();
-			//	return;
-			case ']':
-				if (!currlevel && debug_mode_key_w)
-					MaxSpellsCheat();
-				return;
-			case 'a':
-				if (debug_mode_key_inverted_v) {
-					spelldata[SPL_TELEPORT].sTownSpell = TRUE;
-					plr[myplr]._pSplLvl[plr[myplr]._pSpell]++;
-				}
-				return;
-			case 'O': // JAKE: Changed, used to be 'D'
-				PrintDebugPlayer(1);
-				return;
-			case 'o': // JAKE: Changed, used to be 'd'
-				PrintDebugPlayer(0);
-				return;
-			case 'e':
-				if (debug_mode_key_d) {
-					sprintf(tempstr, "EFlag = %i", plr[myplr]._peflag);
-					NetSendCmdString(1 << myplr, tempstr);
-				}
-				return;
-			case 'L':
-			case 'l':
-				if (debug_mode_key_inverted_v)
-					ToggleLighting();
-				return;
-			case 'M':
-				NextDebugMonster();
-				return;
-			case 'm':
-				GetDebugMonster();
-				return;
-			case 'R':
-			case 'r':
-				sprintf(tempstr, "seed = %i", glSeedTbl[currlevel]);
-				NetSendCmdString(1 << myplr, tempstr);
-				sprintf(tempstr, "Mid1 = %i : Mid2 = %i : Mid3 = %i", glMid1Seed[currlevel], glMid2Seed[currlevel], glMid3Seed[currlevel]);
-				NetSendCmdString(1 << myplr, tempstr);
-				sprintf(tempstr, "End = %i", glEndSeed[currlevel]);
-				NetSendCmdString(1 << myplr, tempstr);
-				return;
-			case 'T':
-			case 't':
-				if (debug_mode_key_inverted_v) {
-					sprintf(tempstr, "PX = %i  PY = %i", plr[myplr].WorldX, plr[myplr].WorldY);
-					NetSendCmdString(1 << myplr, tempstr);
-					sprintf(tempstr, "CX = %i  CY = %i  DP = %i", cursmx, cursmy, dungeon[cursmx][cursmy]);
-					NetSendCmdString(1 << myplr, tempstr);
-				}
-				return;
-			case '|':
-				if (!currlevel && debug_mode_key_w)
-					GiveGoldCheat();
-				return;
-			case '~':
-				if (!currlevel && debug_mode_key_w)
-					StoresCheat();
-				return;
-#endif
-			default:
+				questlog = 0;
+				msgdelay = 0;
+				gamemenu_off();
+				doom_close();
 				return;
 			}
+			v4 = MouseX;
+			if (MouseX >= 480 || MouseY >= 352) {
+			LABEL_101:
+				if (!invflag && chrflag && v4 > 160 && MouseY < 352)
+					SetCursorPos(v4 - 160, MouseY);
+				goto LABEL_106;
+			}
+			SetCursorPos(MouseX + 160, MouseY);
 		}
+		v4 = MouseX;
+		goto LABEL_101;
+		return;
+	case '[': // JAKE: Z key used to zoom in/out.
+	case '{':
+		zoomflag = zoomflag == 0;
+		return;
+#ifdef _DEBUG
+	case ')':
+	case '0':
+		if (debug_mode_key_inverted_v) {
+			if (arrowdebug > 2)
+				arrowdebug = 0;
+			if (!arrowdebug) {
+				plr[myplr]._pIFlags &= ~ISPL_FIRE_ARROWS;
+				plr[myplr]._pIFlags &= ~ISPL_LIGHT_ARROWS;
+			}
+			if (arrowdebug == 1)
+				plr[myplr]._pIFlags |= ISPL_FIRE_ARROWS;
+			if (arrowdebug == 2)
+				plr[myplr]._pIFlags |= ISPL_LIGHT_ARROWS;
+			arrowdebug++;
+		}
+		return;
+	case ':':
+		if (!currlevel && debug_mode_key_w) {
+			sprintf(tempstr, "CHEAT: Giving all spells");
+			NetSendCmdString(1 << myplr, tempstr);
+			SetAllSpellsCheat();
+		}
+		return;
+	//case '[': // JAKE: This was the old code. This is pointless.
+	//	if (!currlevel && debug_mode_key_w)
+	//		TakeGoldCheat();
+	//	return;
+	case ']':
+		if (!currlevel && debug_mode_key_w)
+			MaxSpellsCheat();
+		return;
+	case 'a':
+		if (debug_mode_key_inverted_v) {
+			spelldata[SPL_TELEPORT].sTownSpell = TRUE;
+			plr[myplr]._pSplLvl[plr[myplr]._pSpell]++;
+		}
+		return;
+	case 'O': // JAKE: Changed, used to be 'D'
+		PrintDebugPlayer(1);
+		return;
+	case 'o': // JAKE: Changed, used to be 'd'
+		PrintDebugPlayer(0);
+		return;
+	case 'e':
+		if (debug_mode_key_d) {
+			sprintf(tempstr, "EFlag = %i", plr[myplr]._peflag);
+			NetSendCmdString(1 << myplr, tempstr);
+		}
+		return;
+	case 'L':
+	case 'l':
+		if (debug_mode_key_inverted_v)
+			ToggleLighting();
+		return;
+	case 'M':
+		NextDebugMonster();
+		return;
+	case 'm':
+		GetDebugMonster();
+		return;
+	case 'R':
+	case 'r':
+		sprintf(tempstr, "seed = %i", glSeedTbl[currlevel]);
+		NetSendCmdString(1 << myplr, tempstr);
+		sprintf(tempstr, "Mid1 = %i : Mid2 = %i : Mid3 = %i", glMid1Seed[currlevel], glMid2Seed[currlevel], glMid3Seed[currlevel]);
+		NetSendCmdString(1 << myplr, tempstr);
+		sprintf(tempstr, "End = %i", glEndSeed[currlevel]);
+		NetSendCmdString(1 << myplr, tempstr);
+		return;
+	case 'T':
+	case 't':
+		if (debug_mode_key_inverted_v) {
+			sprintf(tempstr, "PX = %i  PY = %i", plr[myplr].WorldX, plr[myplr].WorldY);
+			NetSendCmdString(1 << myplr, tempstr);
+			sprintf(tempstr, "CX = %i  CY = %i  DP = %i", cursmx, cursmy, dungeon[cursmx][cursmy]);
+			NetSendCmdString(1 << myplr, tempstr);
+		}
+		return;
+	case '|':
+		if (!currlevel && debug_mode_key_w)
+			GiveGoldCheat();
+		return;
+	case '~':
+		if (!currlevel && debug_mode_key_w)
+			StoresCheat();
+		return;
+#endif
+	default:
+		return;
 	}
+}
+}
 }
 // 4B84DC: using guessed type int dropGoldFlag;
 // 4B8968: using guessed type int sbookflag;

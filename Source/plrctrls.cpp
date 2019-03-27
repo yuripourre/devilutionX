@@ -407,28 +407,15 @@ void walkInDir(int dir)
 {
 	if (invflag || spselflag || chrflag) // don't walk if inventory, speedbook or char info windows are open
 		return;
+	ticks = GetTickCount();
+	if (ticks - invmove < 370) {
+		return;
+	}
+	invmove = ticks;
 	ClrPlrPath(myplr);                   // clear nodes
 	plr[myplr].destAction = ACTION_NONE; // stop attacking, etc.
 	HideCursor();
 	plr[myplr].walkpath[0] = dir;
-}
-
-void backOutOfMenus()
-{
-	gamemenu_previous(); // back out of speech menus too
-	helpflag = 0;
-	invflag = 0;
-	chrflag = 0;
-	sbookflag = 0;
-	spselflag = 0;
-	if (qtextflag) {
-		qtextflag = FALSE;
-		sfx_stop();
-	}
-	questlog = 0;
-	msgdelay = 0;
-	gamemenu_off();
-	doom_close();
 }
 
 void __fastcall keyboardExpension()
@@ -477,18 +464,18 @@ void __fastcall keyboardExpension()
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
 		if (!invflag) {
 			HideCursor();
-			if (ticks - opentimer >= 300) {
+			if (ticks - opentimer > 300) {
 				opentimer = ticks;
 				checkItemsNearby(true);
 			}
 		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
-		HideCursor();
-		if (ticks - opentimer >= 400) {
-			backOutOfMenus();
-			RightMouseDown();
-			opentimer = ticks;
+		talktick = GetTickCount();
+		if (talktick - talkwait < 1500) { // prevent re-entering talk after finished
+			return;
 		}
+		talkwait = talktick;
+		RightMouseDown();
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000) {
 		walkInDir(WALK_SE);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x44) & 0x8000) {

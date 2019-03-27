@@ -2005,6 +2005,9 @@ void __cdecl STextESC()
 	char v1; // cl
 	char v2; // cl
 
+	talktick = GetTickCount();
+	talkwait = talktick;
+
 	if (qtextflag) {
 		qtextflag = FALSE;
 		if (leveltype == DTYPE_TOWN)
@@ -3570,9 +3573,6 @@ void __cdecl S_DrunkEnter()
 
 void __cdecl STextEnter()
 {
-	talktick = GetTickCount();
-	talkwait = talktick;
-
 	if (qtextflag) {
 		qtextflag = FALSE;
 		if (leveltype == DTYPE_TOWN)

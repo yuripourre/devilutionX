@@ -2834,8 +2834,9 @@ int __fastcall control_talk_last_key(int a1)
 	signed int v3; // eax
 
 	v1 = a1;
-	if (gbMaxPlayers == 1 || !talkflag || (unsigned int)a1 <= VK_SPACE)
+	if (gbMaxPlayers == 1 || !talkflag || (unsigned int)a1 <= VK_SPACE) {
 		return 0;
+	}
 	v3 = strlen(sgszTalkMsg);
 	if (v3 < 78) {
 		sgszTalkMsg[v3 + 1] = 0;

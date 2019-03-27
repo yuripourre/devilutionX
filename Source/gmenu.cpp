@@ -289,10 +289,13 @@ int __fastcall gmenu_get_lfont(TMenuItem *pItem)
 	return i - 2;
 }
 
+DWORD gticks;
+static DWORD gmenuslow;
 BOOL __fastcall gmenu_presskeys(int a1)
 {
 	if (!dword_634480)
 		return 0;
+	gticks = GetTickCount();
 	switch (a1) {
 	case VK_RETURN:
 		if ((sgpCurrItem->dwFlags & 0x80000000) != 0) {
@@ -301,8 +304,11 @@ BOOL __fastcall gmenu_presskeys(int a1)
 		}
 		break;
 	case VK_ESCAPE:
-		PlaySFX(IS_TITLEMOV);
-		gmenu_call_proc(0, 0);
+		if (gticks - gmenuslow > 300) {
+			PlaySFX(IS_TITLEMOV);
+			gmenu_call_proc(0, 0);
+		}
+		gmenuslow = gticks;
 		break;
 	case VK_SPACE:
 		// JAKE: I want space to do the same as the enter key
@@ -313,16 +319,28 @@ BOOL __fastcall gmenu_presskeys(int a1)
 		break;
 		//return FALSE; // original
 	case VK_LEFT:
-		gmenu_left_right(0);
+		if (gticks - gmenuslow > 100) {
+			gmenu_left_right(0);
+		}
+		gmenuslow = gticks;
 		break;
 	case VK_RIGHT:
-		gmenu_left_right(1);
+		if (gticks - gmenuslow > 100) {
+			gmenu_left_right(1);
+		}
+		gmenuslow = gticks;
 		break;
 	case VK_UP:
-		gmenu_up_down(0);
+		if (gticks - gmenuslow > 100) {
+			gmenu_up_down(0);
+		}
+		gmenuslow = gticks;
 		break;
 	case VK_DOWN:
-		gmenu_up_down(1);
+		if (gticks - gmenuslow > 100) {
+			gmenu_up_down(1);
+		}
+		gmenuslow = gticks;
 		break;
 	}
 	return TRUE;
