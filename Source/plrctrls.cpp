@@ -17,6 +17,7 @@ int speedspellcount = 0;
 int hsr[3] = { 0, 0, 0 }; // hot spell row counts
 DWORD talkwait;
 DWORD talktick;
+bool inmainmenu = false;
 
 // 0 = not near, >0 = distance related player 1 coordinates
 coords checkNearbyObjs(int x, int y, int diff)

@@ -5,3 +5,5 @@
 #define XINPUT_GAMEPAD_TRIGGER_THRESHOLD 30
 
 void CheckForController();
+void ReleaseAllButtons();
+

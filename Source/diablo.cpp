@@ -123,6 +123,9 @@ BOOL __fastcall StartGame(BOOL bNewGame, BOOL bSinglePlayer)
 		else
 			uMsg = WM_DIABLOADGAME;
 
+		inmainmenu = false; // JAKE: no longer in main menu
+		ReleaseAllButtons();
+
 		run_game_loop(uMsg);
 		NetClose();
 		pfile_create_player_description(0, 0);

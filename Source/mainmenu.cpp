@@ -36,6 +36,7 @@ int __stdcall mainmenu_select_hero_dialog(
 {
 	BOOL hero_is_created = TRUE;
 	int dlgresult = 0;
+	inmainmenu = true;
 	if (gbMaxPlayers == 1) {
 		if (!UiSelHeroSingDialog(
 		        pfile_ui_set_hero_infos,
@@ -84,6 +85,7 @@ void __cdecl mainmenu_loop()
 {
 	BOOL done;
 	int menu;
+	inmainmenu = true; // JAKE: Let the controller know we're in the main menu
 
 	done = FALSE;
 	mainmenu_refresh_music();

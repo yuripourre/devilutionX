@@ -20,6 +20,8 @@ extern const InvXY InvRect[73]; // wasn't made public, so I'll add this here fro
 extern DWORD talkwait;
 extern DWORD talktick;
 
+extern bool inmainmenu;
+
 #define INV_TOP 240;
 #define INV_LEFT 350;
 #define INV_HEIGHT 320;

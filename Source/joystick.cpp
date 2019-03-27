@@ -1,10 +1,13 @@
 #include "../types.h"
-#include <Xinput.h>
+
+#include <algorithm>
 #include <list>
 #include <map>
 #include <string>
-#include <algorithm>
 #pragma comment(lib, "xinput.lib")
+#include <Xinput.h>
+
+std::list<WORD> heldBtns;
 
 class CXBOXController {
 private:
@@ -18,6 +21,8 @@ public:
 	void Vibrate(int leftVal = 0, int rightVal = 0);
 	std::map<WORD, int> Buttons;
 };
+
+CXBOXController *Player1;
 
 CXBOXController::CXBOXController(int playerNumber)
 {
@@ -53,15 +58,27 @@ void CXBOXController::Vibrate(int leftVal, int rightVal)
 	XInputSetState(_controllerNum, &Vibration);
 }
 
-CXBOXController *Player1;
+void ReleaseAllButtons()
+{
+	for (std::map<WORD, int>::iterator it = Player1->Buttons.begin(); it != Player1->Buttons.end(); ++it) {
+		keybd_event(it->second, 0, KEYEVENTF_KEYUP, 0);
+		heldBtns.remove(it->first);
+	}
+}
+
 XINPUT_STATE previous;
 bool releaseController = false;
 void CheckForController()
 {
 	Player1 = new CXBOXController(1);
-	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_A, VK_SPACE));
+	
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_B, 0x49)); // I key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_X, VK_RETURN));
+	if (inmainmenu) {
+		Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_A, VK_RETURN));
+	} else {
+		Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_A, VK_SPACE));
+	}
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_Y, 0x58)); // X key
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_BACK, VK_TAB));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_START, VK_ESCAPE));
@@ -72,14 +89,14 @@ void CheckForController()
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_LEFT, VK_LEFT));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_RIGHT, VK_RIGHT));
 
-	std::list<WORD> heldBtns;
-
 LABEL_14:
 	while (Player1->IsConnected()) {
 		releaseController = true;
 		for (auto button : Player1->Buttons) {
 			if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) { // currently pressing
 				WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
+				if (inmainmenu && mapping == VK_SPACE) // in main menu, swap space for return
+					mapping = VK_RETURN;
 				keybd_event(mapping, 0, 0, 0);
 				heldBtns.push_back(button.first);
 			}
@@ -91,12 +108,14 @@ LABEL_14:
 				heldBtns.remove(button.first);
 			}
 		}
+		if (inmainmenu) {
+			::Sleep(100);
+			ReleaseAllButtons();
+		}
 	}
 
 	if (releaseController) { // release all the keys
-		for (std::map<WORD, int>::iterator it = Player1->Buttons.begin(); it != Player1->Buttons.end(); ++it) {
-			keybd_event(it->first, 0, KEYEVENTF_KEYUP, 0);
-		}
+		ReleaseAllButtons();
 		releaseController = false;
 	}
 
