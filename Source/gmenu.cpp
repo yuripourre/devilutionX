@@ -118,23 +118,34 @@ BOOL __cdecl gmenu_exception()
 	return dword_634480 != 0;
 }
 
+DWORD gticks;
+static DWORD gmenuslow;
+
 void __fastcall gmenu_call_proc(TMenuItem *pItem, void(__cdecl *gmFunc)())
 {
 	TMenuItem *v2;         // eax
 	int v3;                // ecx
 	void(__cdecl * *v4)(); // edx
 
+	gticks = GetTickCount();
+	if (gticks - gmenuslow < 300) {
+		return;
+	}
+	gmenuslow = gticks;
+
 	PauseMode = 0;
 	byte_634464 = 0;
 	v2 = pItem;
 	dword_63447C = gmFunc;
 	dword_634480 = pItem;
+
 	if (gmFunc) {
 		gmFunc();
 		v2 = dword_634480;
 	}
 	v3 = 0;
 	dword_63448C = 0;
+
 	if (v2) {
 		v4 = &v2->fnMenu;
 		while (*v4) {
@@ -289,8 +300,6 @@ int __fastcall gmenu_get_lfont(TMenuItem *pItem)
 	return i - 2;
 }
 
-DWORD gticks;
-static DWORD gmenuslow;
 BOOL __fastcall gmenu_presskeys(int a1)
 {
 	if (!dword_634480)

@@ -50,6 +50,7 @@ void __cdecl gamemenu_previous()
 		proc = gamemenu_enable_multi;
 		item = sgMultiMenu;
 	}
+	
 	gmenu_call_proc(item, proc);
 	PressEscKey();
 }
