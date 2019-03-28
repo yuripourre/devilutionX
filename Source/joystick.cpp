@@ -8,6 +8,7 @@
 #include <Xinput.h>
 
 std::list<WORD> heldBtns;
+bool conInv = false;
 
 class CXBOXController {
 private:
@@ -97,6 +98,8 @@ LABEL_14:
 				WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
 				if (inmainmenu && mapping == VK_SPACE) // in main menu, swap space for return
 					mapping = VK_RETURN;
+				if (mapping == 0x49)
+					conInv = true; // we opened inventory via B button
 				keybd_event(mapping, 0, 0, 0);
 				heldBtns.push_back(button.first);
 			}

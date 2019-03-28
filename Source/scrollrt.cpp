@@ -390,6 +390,10 @@ void __fastcall DrawView(int StartX, int StartY)
 		DrawInv();
 	else if (sbookflag)
 		DrawSpellBook();
+	else {
+		if (conInv)
+			conInv = false;
+	}
 
 	DrawDurIcon();
 

@@ -214,6 +214,8 @@ void invMove(int key)
 		} else if (slot == SLOTXY_RING_RIGHT) {
 			x = InvRect[SLOTXY_RING_LEFT].X + (INV_SLOT_SIZE_PX / 2);
 			y = InvRect[SLOTXY_RING_LEFT].Y - (INV_SLOT_SIZE_PX / 2);
+		} else if (slot == SLOTXY_BELT_FIRST) {
+			// do nothing
 		} else if (slot == SLOTXY_RING_LEFT) {                                        // left ring
 			                                                                          // do nothing
 		} else if (slot >= SLOTXY_HAND_LEFT_FIRST && slot <= SLOTXY_HAND_LEFT_LAST) { // left hand

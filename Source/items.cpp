@@ -4068,7 +4068,7 @@ void __fastcall UseItem(int p, int Mid, int spl)
 		}
 		break;
 	case IMISC_SCROLL:
-		if (spelldata[spl].sTargeted) {
+		if (spelldata[spl].sTargeted && pcurs >= CURSOR_HAND && !conInv) { // JAKE: Only let them chose a portal spot if they're not using a controller
 			plr[p]._pTSpell = spl;
 			plr[p]._pTSplType = RSPLTYPE_INVALID;
 			if (p == myplr)

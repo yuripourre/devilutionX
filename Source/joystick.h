@@ -6,4 +6,4 @@
 
 void CheckForController();
 void ReleaseAllButtons();
-
+extern bool conInv;
