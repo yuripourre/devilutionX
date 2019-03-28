@@ -1541,39 +1541,8 @@ void __fastcall PressChar(int vkey)
 				if (ticks - menuopenslow < 300) {
 					return;
 				}
-				if (!talkflag)
-					return;
 				menuopenslow = ticks;
-				gamemenu_previous(); // back out of speech menus too
-				if (!chrflag) {
-					if (!invflag) {
-					LABEL_106:
-						helpflag = 0;
-						invflag = 0;
-						chrflag = 0;
-						sbookflag = 0;
-						spselflag = 0;
-						if (qtextflag && leveltype == DTYPE_TOWN) {
-							qtextflag = FALSE;
-							sfx_stop();
-						}
-						questlog = 0;
-						msgdelay = 0;
-						gamemenu_off();
-						doom_close();
-						return;
-					}
-					v4 = MouseX;
-					if (MouseX >= 480 || MouseY >= 352) {
-					LABEL_101:
-						if (!invflag && chrflag && v4 > 160 && MouseY < 352)
-							SetCursorPos(v4 - 160, MouseY);
-						goto LABEL_106;
-					}
-					SetCursorPos(MouseX + 160, MouseY);
-				}
-				v4 = MouseX;
-				goto LABEL_101;
+				PressEscKey();
 				return;
 			case '[': // JAKE: Z key used to zoom in/out.
 			case '{':

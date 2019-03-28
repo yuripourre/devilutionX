@@ -55,7 +55,7 @@ void __fastcall checkItemsNearby(bool interact)
 	//sprintf(tempstr, "SCANNING FOR OBJECTS");
 	//NetSendCmdString(1 << myplr, tempstr);
 	for (int i = 0; i < MAXOBJECTS; i++) {
-		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1).x != -1 && object[i]._oSelFlag > 0) {
+		if (checkNearbyObjs(object[i]._ox, object[i]._oy, 1).x != -1 && object[i]._oSelFlag > 0 && currlevel) { // make sure we're in the dungeon to scan for objs
 			pcursobj = i;
 			if (interact) {
 				LeftMouseCmd(false);
