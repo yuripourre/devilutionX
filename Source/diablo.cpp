@@ -1548,7 +1548,7 @@ void __fastcall PressChar(int vkey)
 				return;
 			case '[':
 			case '{':
-				// make this use first heal potion in belt
+				// JAKE: make this use first heal potion in belt
 				if (ticks - menuopenslow < 300) {
 					return;
 				}
@@ -1564,7 +1564,7 @@ void __fastcall PressChar(int vkey)
 				return;
 			case ']':
 			case '}':
-				// make this use first mana potion in belt
+				// JAKE: make this use first mana potion in belt
 				if (ticks - menuopenslow < 300) {
 					return;
 				}

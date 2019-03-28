@@ -99,6 +99,7 @@ void CheckForController()
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_DOWN, VK_DOWN));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_LEFT, VK_LEFT));
 	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_DPAD_RIGHT, VK_RIGHT));
+	Player1->Buttons.insert(std::pair<WORD, int>(XINPUT_GAMEPAD_RIGHT_THUMB, VK_LBUTTON));
 
 LABEL_14:
 	while (Player1->IsConnected()) {
@@ -126,39 +127,31 @@ LABEL_14:
 		if (deadzoneY > 0)
 			rightStickY *= 1 / (1 - deadzoneY);
 
-		leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger / 255;
-		rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger / 255;
+		leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger /*/ 255*/;
+		rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger /* 255*/;
 
 		// right joystick moves cursor
-		if (rightStickX != 0 || rightStickY != 0) {
+		if (rightStickX > 0.35 || rightStickY > 0.35 || rightStickX < -0.35 || rightStickY < -0.35) {
 			int x = MouseX;
 			int y = MouseY;
-			if (rightStickX > 0)
-				x++;
-			else
-				x--;
-			if (rightStickY > 0)
-				y++;
-			else
-				y--;
+			if (rightStickX > 0.50)
+				x += 2;
+			else if(rightStickX < -0.50)
+				x -= 2;
+			if (rightStickY > 0.50)
+				y -= 2;
+			else if (rightStickY < -0.50)
+				y += 2;
 			SetCursorPos(x, y);
 		}
 
-		tticks = GetTickCount();
-		if (leftTrigger >= 1) { // [ key (use first health potion in belt)
-			if (tticks - triggerslow < 300) {
-				return;
-			}
-			triggerslow = tticks;
+		//tticks = GetTickCount();
+		if (leftTrigger > 0.50) { // [ key (use first health potion in belt)
 			keybd_event(VK_OEM_4, 0, 0, 0);
 			::Sleep(50);
 			keybd_event(VK_OEM_4, 0, KEYEVENTF_KEYUP, 0);
 		}
-		if (rightTrigger >= 1) { // ] key (use first mana potion in belt)
-			if (tticks - triggerslow < 300) {
-				return;
-			}
-			triggerslow = tticks;
+		if (rightTrigger > 0.50) { // ] key (use first mana potion in belt)
 			keybd_event(VK_OEM_6, 0, 0, 0);
 			::Sleep(50);
 			keybd_event(VK_OEM_6, 0, KEYEVENTF_KEYUP, 0);
