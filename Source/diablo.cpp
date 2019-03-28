@@ -1533,8 +1533,10 @@ void __fastcall PressChar(int vkey)
 			case 'v':
 				NetSendCmdString(1 << myplr, gszProductName);
 				return;
-			case 'Z': // JAKE: Added X key
+			case 'Z':
 			case 'z':
+				zoomflag = zoomflag == 0;
+				return;
 			case 'x':
 			case 'X':
 				// JAKE: Spacebar used to go back, now Z goes back.
@@ -1544,9 +1546,36 @@ void __fastcall PressChar(int vkey)
 				menuopenslow = ticks;
 				PressEscKey();
 				return;
-			case '[': // JAKE: Z key used to zoom in/out.
+			case '[':
 			case '{':
-				zoomflag = zoomflag == 0;
+				// make this use first heal potion in belt
+				if (ticks - menuopenslow < 300) {
+					return;
+				}
+				menuopenslow = ticks;
+				for (int i = 0; i < MAXBELTITEMS; i++) {
+					if (plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_HEALING || plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_FULL_HEALING ||
+						plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_REJUVENATION || plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_FULL_REJUVENATION) {
+						int invNum = i + 47;
+						UseInvItem(myplr, invNum);
+						break;
+					}
+				}
+				return;
+			case ']':
+			case '}':
+				// make this use first mana potion in belt
+				if (ticks - menuopenslow < 300) {
+					return;
+				}
+				menuopenslow = ticks;
+				for (int i = 0; i < MAXBELTITEMS; i++) {
+					if (plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_MANA || plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_FULL_MANA || plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_REJUVENATION || plr[myplr].SpdList[i]._iCurs == ICURS_POTION_OF_FULL_REJUVENATION) {
+						int invNum = i + 47;
+						UseInvItem(myplr, invNum);
+						break;
+					}
+				}
 				return;
 #ifdef _DEBUG
 			case ')':
@@ -1576,10 +1605,10 @@ void __fastcall PressChar(int vkey)
 			//	if (!currlevel && debug_mode_key_w)
 			//		TakeGoldCheat();
 			//	return;
-			case ']':
+			/*case ']':
 				if (!currlevel && debug_mode_key_w)
 					MaxSpellsCheat();
-				return;
+				return;*/
 			case 'a':
 				if (debug_mode_key_inverted_v) {
 					spelldata[SPL_TELEPORT].sTownSpell = TRUE;

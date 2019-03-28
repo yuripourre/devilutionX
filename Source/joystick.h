@@ -7,3 +7,12 @@
 void CheckForController();
 void ReleaseAllButtons();
 extern bool conInv;
+
+extern float leftStickX;
+extern float leftStickY;
+extern float rightStickX;
+extern float rightStickY;
+extern float leftTrigger;
+extern float rightTrigger;
+extern float deadzoneX;
+extern float deadzoneY;

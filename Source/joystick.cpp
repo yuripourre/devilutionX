@@ -9,6 +9,14 @@
 
 std::list<WORD> heldBtns;
 bool conInv = false;
+float leftStickX;
+float leftStickY;
+float rightStickX;
+float rightStickY;
+float leftTrigger;
+float rightTrigger;
+float deadzoneX;
+float deadzoneY;
 
 class CXBOXController {
 private:
@@ -69,6 +77,8 @@ void ReleaseAllButtons()
 
 XINPUT_STATE previous;
 bool releaseController = false;
+static DWORD triggerslow;
+DWORD tticks;
 void CheckForController()
 {
 	Player1 = new CXBOXController(1);
@@ -93,6 +103,67 @@ void CheckForController()
 LABEL_14:
 	while (Player1->IsConnected()) {
 		releaseController = true;
+
+		float normLX = fmaxf(-1, (float)Player1->GetState().Gamepad.sThumbLX / 32767);
+		float normLY = fmaxf(-1, (float)Player1->GetState().Gamepad.sThumbLY / 32767);
+
+		leftStickX = (abs(normLX) < deadzoneX ? 0 : (abs(normLX) - deadzoneX) * (normLX / abs(normLX)));
+		leftStickY = (abs(normLY) < deadzoneY ? 0 : (abs(normLY) - deadzoneY) * (normLY / abs(normLY)));
+
+		if (deadzoneX > 0)
+			leftStickX *= 1 / (1 - deadzoneX);
+		if (deadzoneY > 0)
+			leftStickY *= 1 / (1 - deadzoneY);
+
+		float normRX = fmaxf(-1, (float)Player1->GetState().Gamepad.sThumbRX / 32767);
+		float normRY = fmaxf(-1, (float)Player1->GetState().Gamepad.sThumbRY / 32767);
+
+		rightStickX = (abs(normRX) < deadzoneX ? 0 : (abs(normRX) - deadzoneX) * (normRX / abs(normRX)));
+		rightStickY = (abs(normRY) < deadzoneY ? 0 : (abs(normRY) - deadzoneY) * (normRY / abs(normRY)));
+
+		if (deadzoneX > 0)
+			rightStickX *= 1 / (1 - deadzoneX);
+		if (deadzoneY > 0)
+			rightStickY *= 1 / (1 - deadzoneY);
+
+		leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger / 255;
+		rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger / 255;
+
+		// right joystick moves cursor
+		if (rightStickX != 0 || rightStickY != 0) {
+			int x = MouseX;
+			int y = MouseY;
+			if (rightStickX > 0)
+				x++;
+			else
+				x--;
+			if (rightStickY > 0)
+				y++;
+			else
+				y--;
+			SetCursorPos(x, y);
+		}
+
+		tticks = GetTickCount();
+		if (leftTrigger >= 1) { // [ key (use first health potion in belt)
+			if (tticks - triggerslow < 300) {
+				return;
+			}
+			triggerslow = tticks;
+			keybd_event(VK_OEM_4, 0, 0, 0);
+			::Sleep(50);
+			keybd_event(VK_OEM_4, 0, KEYEVENTF_KEYUP, 0);
+		}
+		if (rightTrigger >= 1) { // ] key (use first mana potion in belt)
+			if (tticks - triggerslow < 300) {
+				return;
+			}
+			triggerslow = tticks;
+			keybd_event(VK_OEM_6, 0, 0, 0);
+			::Sleep(50);
+			keybd_event(VK_OEM_6, 0, KEYEVENTF_KEYUP, 0);
+		}
+
 		for (auto button : Player1->Buttons) {
 			if ((Player1->GetState().Gamepad.wButtons & button.first) != 0) { // currently pressing
 				WORD mapping = (Player1->Buttons.find(button.first) != Player1->Buttons.end() ? Player1->Buttons.find(button.first)->second : button.first);
