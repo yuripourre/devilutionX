@@ -401,13 +401,13 @@ void __fastcall diablo_parse_flags(char *args)
 			case 'n': // disable startup video
 				showintrodebug = 0;
 				break;
-			case 'q': // <qnum>: force a certain quest
+			/*case 'q': // <qnum>: force a certain quest
 				for (; isspace(*args); ++args)
 					;
 				for (n = 0; isdigit(*args); n = v15 + 10 * n - 48)
 					v15 = *args++;
 				questdebug = n;
-				break;
+				break;*/
 			case 'r': // <seed>: set map seed to
 				for (; isspace(*args); ++args)
 					;

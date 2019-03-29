@@ -156,7 +156,7 @@ int PanBtnPos[8][5] = {
 	{ 87, 443, 33, 32, 1 },
 	{ 527, 443, 33, 32, 1 }
 };
-char *PanBtnHotKey[8] = { "'c'", "'q'", "Tab", "Esc", "'i'", "'b'", "Enter", NULL };
+char *PanBtnHotKey[8] = { "'c'", "'l'", "Tab", "Esc", "'i'", "'b'", "Enter", NULL };
 char *PanBtnStr[8] = {
 	"Character Information",
 	"Quests log",

@@ -127,8 +127,8 @@ LABEL_14:
 		if (deadzoneY > 0)
 			rightStickY *= 1 / (1 - deadzoneY);
 
-		leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger /*/ 255*/;
-		rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger /* 255*/;
+		leftTrigger = (float)Player1->GetState().Gamepad.bLeftTrigger;
+		rightTrigger = (float)Player1->GetState().Gamepad.bRightTrigger;
 
 		// right joystick moves cursor
 		if (rightStickX > 0.35 || rightStickY > 0.35 || rightStickX < -0.35 || rightStickY < -0.35) {
