@@ -458,10 +458,11 @@ void __fastcall keyboardExpension()
 		} else {
 			HideCursor();
 			talktick = GetTickCount(); // this is shared with STextESC, do NOT duplicate or use anywhere else
-			if (talktick - talkwait > 1500) { // prevent re-entering talk after finished
-				talkwait = talktick;
-				if (!checkMonstersNearby(true))
-					checkTownersNearby(true);
+			if (!checkMonstersNearby(true)) {
+				if (talktick - talkwait > 1500) { // prevent re-entering talk after finished
+					talkwait = talktick;
+						checkTownersNearby(true);
+				}
 			}
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
