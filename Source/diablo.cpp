@@ -1306,7 +1306,6 @@ void __fastcall PressChar(int vkey)
 	int v15; // eax
 	int v16; // eax
 	int v18; // [esp-4h] [ebp-8h]
-	int invNum = 0;
 
 	v1 = vkey;
 	if (!gmenu_exception() && !control_talk_last_key(v1) && sgnTimeoutCurs == CURSOR_NONE && !deathflag) {
@@ -1502,32 +1501,12 @@ void __fastcall PressChar(int vkey)
 			case 'Q':
 			case 'q':
 				// JAKE: make this use first heal potion in belt
-				if (ticks - menuopenslow < 300) {
-					return;
-				}
-				menuopenslow = ticks;
-				for (int i = 0; i < MAXBELTITEMS; i++) {
-					if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV) && plr[myplr].SpdList[i]._itype > -1) {
-						invNum = i + INVITEM_BELT_FIRST;
-						UseInvItem(myplr, invNum);
-						break;
-					}
-				}
+				useBeltPotion(false);
 				return;
 			case 'e':
 			case 'E':
 				// JAKE: make this use first mana potion in belt
-				if (ticks - menuopenslow < 300) {
-					return;
-				}
-				menuopenslow = ticks;
-				for (int i = 0; i < MAXBELTITEMS; i++) {
-					if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV || AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV) && plr[myplr].SpdList[i]._itype > -1) {
-						invNum = i + INVITEM_BELT_FIRST;
-						UseInvItem(myplr, invNum);
-						break;
-					}
-				}
+				useBeltPotion(true);
 				return;
 			case 'l':
 			case 'L':

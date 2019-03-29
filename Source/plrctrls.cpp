@@ -424,6 +424,28 @@ void walkInDir(int dir)
 	plr[myplr].walkpath[0] = dir;
 }
 
+static DWORD menuopenslow;
+void useBeltPotion(bool mana)
+{
+	int invNum = 0;
+	if (ticks - menuopenslow < 300) {
+		return;
+	}
+	menuopenslow = ticks;
+	for (int i = 0; i < MAXBELTITEMS; i++) {
+		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) ||
+			(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) ||
+			(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV))
+		{
+			if (plr[myplr].SpdList[i]._itype > -1) {
+				invNum = i + INVITEM_BELT_FIRST;
+				UseInvItem(myplr, invNum);
+				break;
+			}
+		}
+	}
+}
+
 void __fastcall keyboardExpension()
 {
 	static DWORD opentimer;

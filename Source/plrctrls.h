@@ -9,6 +9,7 @@ bool __fastcall checkMonstersNearby(bool attack);
 extern bool newCurHidden;
 void invMove(int key);
 void HideCursor();
+void useBeltPotion(bool mana);
 typedef struct coords {
 	int x;
 	int y;
