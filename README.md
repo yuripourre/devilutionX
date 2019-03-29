@@ -1,5 +1,9 @@
 Adding keyboard movements and controller support.
 
+![](https://newagesoldier.com/devilution/img/diablo_keyboard.jpg)
+
+![](https://newagesoldier.com/devilution/img/diablo_controller.jpg)
+
 ## Roadmap
 
 - ~~Part 1 : Impliment functions and map them to keyboard controls.~~
