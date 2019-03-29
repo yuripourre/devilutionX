@@ -461,7 +461,12 @@ void __fastcall keyboardExpension()
 		if (invflag) {                         // inventory is open
 			if (ticks - clickinvtimer >= 300) {
 				clickinvtimer = ticks;
-				CheckInvItem();
+				if (pcurs == CURSOR_IDENTIFY)
+					CheckIdentify(myplr, pcursinvitem);
+				else if (pcurs == CURSOR_REPAIR)
+					DoRepair(myplr, pcursinvitem);
+				else
+					CheckInvItem();
 			}
 		} else if (spselflag) {
 			SetSpell();
