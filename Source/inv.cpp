@@ -2650,7 +2650,7 @@ int __fastcall UseInvItem(int pnum, int cii)
 	if (plr[pnum]._pInvincible && !plr[v2]._pHitPoints && pnum == myplr)
 		return 1;
 	result = 1;
-	if (pcurs == 1 && !stextflag) {
+	if (pcurs <= 1 && !stextflag) { // JAKE: Let people without a cursor use items too
 		if (cii <= 5)
 			return 0;
 		if (cii > 46) {

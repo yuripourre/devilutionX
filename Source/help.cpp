@@ -20,7 +20,9 @@ const char gszHelpText[] = {
 	"B: Open Spellbook|"
 	"I: Open Inventory screen|"
 	"C: Open Character screen|"
-	"Q: Open Quest log|"
+	"Q: Use first health potion in belt|" // JAKE: Added
+	"E: Use first mana potion in belt|" // JAKE: Added
+	"L: Open Quest log|" // JAKE: Changed, used to be Q
 	"F: Reduce screen brightness|"
 	"G: Increase screen brightness|"
 	"X: Cast Spell or use skill|" // Jake: Added new key

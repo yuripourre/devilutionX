@@ -17,6 +17,7 @@ int speedspellcount = 0;
 int hsr[3] = { 0, 0, 0 }; // hot spell row counts
 DWORD talkwait;
 DWORD talktick;
+static DWORD castwait;
 bool inmainmenu = false;
 
 // 0 = not near, >0 = distance related player 1 coordinates
@@ -456,13 +457,12 @@ void __fastcall keyboardExpension()
 			}
 		} else {
 			HideCursor();
-			talktick = GetTickCount();
-			if (talktick - talkwait < 500) { // prevent re-entering talk after finished
-				return;
+			talktick = GetTickCount(); // this is shared with STextESC, do NOT duplicate or use anywhere else
+			if (talktick - talkwait > 1500) { // prevent re-entering talk after finished
+				talkwait = talktick;
+				if (!checkMonstersNearby(true))
+					checkTownersNearby(true);
 			}
-			talkwait = talktick;
-			if (!checkMonstersNearby(true))
-				checkTownersNearby(true);
 		}
 	} else if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // similar to [] button on PS1 controller. Open chests, doors, pickup items
 		if (!invflag) {
@@ -473,11 +473,11 @@ void __fastcall keyboardExpension()
 			}
 		}
 	} else if (GetAsyncKeyState(0x58) & 0x8000) { // x key, similar to /\ button on PS1 controller. Cast spell or use skill.
-		talktick = GetTickCount();
-		if (talktick - talkwait < 1500) { // prevent re-entering talk after finished
+		ticks = GetTickCount();
+		if (ticks - castwait < 1500) { // prevent re-entering talk after finished
 			return;
 		}
-		talkwait = talktick;
+		castwait = ticks;
 		RightMouseDown();
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000 || leftStickY <= -0.40 && leftStickX >= 0.40) {
 		walkInDir(WALK_SE);

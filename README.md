@@ -6,18 +6,19 @@ Adding keyboard movements and controller support.
 - ~~Part 2 : Integrate XInput for controller support, and impliment our functions.~~
 - Part 3 (OPTIONAL) : Local co-op for controllers. Up to 4 players.
 
-## New Features
+## New Keyboard Setup
 
 - Spacebar - Attack nearby enemies, talk to towns people and merchants.
 - Enter - Pickup gold, potions & equipment from ground, open chests and doors that are nearby.
-- Arrow Keys and WASD Keys - Move character in that direction. Has diagonals programmed.
+- Arrow Keys and WASD Keys - Move character in that direction.
 - Xbox controller support.
-- X Key - Cast spell at nearby enemies.
-- Z Key - Hide/Back Out of menus.
-- [ Key - Zoom in/out.
-- Moved Debug Player key to O.
-- Moved Speed Spell key to H.
-- Moved debug_mode_key_w key to ;.
+- X Key - Cast spell at nearby enemies. Hide/Back Out of menus.
+- Q Key - Use first health potion in belt.
+- E Key - Use first mana potion in belt.
+- Moved Speedbook key to H.
+
+## New Functions
+
 - Automap only moves when you hold down shift.
 - Towns people, items and objects show information when nearby.
 - Inventory snaps to grid system, use arrow/WASD keys to move around. Spacebar to pickup/drop items.
@@ -34,7 +35,10 @@ Adding keyboard movements and controller support.
 - **Start Button:** Open game menu.
 - **Left Shoulder Button:** Open the speed spell book.
 - **Right Shoulder Button:** Open character info window.
-- **Direction Pad:** Move character.
+- **Direction Pad:** & **Left Joystick** Move character.
+- **Right Joystick** Move Cursor. Click for mouse left click.
+- **Left Trigger** Use first health potion in belt.
+- **Right Trigger** Use first mana potion in belt.
 
 ## How To Port To Your Mod
 
@@ -43,4 +47,4 @@ Adding keyboard movements and controller support.
 
 ## Support
 
-If find any bugs, please open an issue!
+If you find any bugs, please open an issue here on GitHub.

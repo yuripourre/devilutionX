@@ -147,14 +147,14 @@ LABEL_14:
 
 		//tticks = GetTickCount();
 		if (leftTrigger > 0.50) { // [ key (use first health potion in belt)
-			keybd_event(VK_OEM_4, 0, 0, 0);
+			keybd_event(0x4C, 0, 0, 0);
 			::Sleep(50);
-			keybd_event(VK_OEM_4, 0, KEYEVENTF_KEYUP, 0);
+			keybd_event(0x4C, 0, KEYEVENTF_KEYUP, 0);
 		}
 		if (rightTrigger > 0.50) { // ] key (use first mana potion in belt)
-			keybd_event(VK_OEM_6, 0, 0, 0);
+			keybd_event(0x45, 0, 0, 0);
 			::Sleep(50);
-			keybd_event(VK_OEM_6, 0, KEYEVENTF_KEYUP, 0);
+			keybd_event(0x45, 0, KEYEVENTF_KEYUP, 0);
 		}
 
 		for (auto button : Player1->Buttons) {
