@@ -1084,9 +1084,9 @@ void __fastcall PressKey(int vkey)
 			if (v1 == VK_RETURN) {
 				control_type_message();
 			}
-			if (v1 == VK_ESCAPE) {
+			if (v1 == VK_ESCAPE || v1 == 0x58) {
 			LABEL_113:
-				if (v1 == VK_ESCAPE) {
+				if (v1 == VK_ESCAPE || v1 == 0x58) {
 					if (!PressEscKey()) {
 						track_repeat_walk(0);
 						gamemenu_previous();
