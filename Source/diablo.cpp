@@ -1186,6 +1186,8 @@ void __fastcall PressKey(int vkey)
 								return;
 							}
 							menuopenslow = ticks;
+							if (spselflag)
+								return;
 							if (stextflag) {
 								STextUp();
 							} else if (questlog) {
@@ -1202,6 +1204,8 @@ void __fastcall PressKey(int vkey)
 								return;
 							}
 							menuopenslow = ticks;
+							if (spselflag)
+								return;
 							if (stextflag) {
 								STextDown();
 							} else if (questlog) {
@@ -1554,6 +1558,8 @@ void __fastcall PressChar(int vkey)
 					return;
 				}
 				menuopenslow = ticks;
+				if (pcurs >= CURSOR_FIRSTITEM && invflag)
+					DropItemBeforeTrig();
 				PressEscKey();
 				return;
 #ifdef _DEBUG

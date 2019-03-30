@@ -127,6 +127,8 @@ bool __fastcall checkMonstersNearby(bool attack)
 // hide the cursor when we start walking via keyboard/controller
 void HideCursor()
 {
+	if (pcurs >= CURSOR_FIRSTITEM) // if we don't drop the item on cursor, it will be destroyed
+		DropItemBeforeTrig();
 	SetCursorPos(320, 180);
 	//FreeCursor(); // glitches potion belt
 	//DestroyCursor(LoadCursor(0, IDC_ARROW)); // doesnt work
@@ -346,7 +348,8 @@ void hotSpellMove(int key)
 	if (!spselflag)
 		return;
 
-	HideCursor();
+	if (pcurs > 0)
+		HideCursor();
 
 	if (ticks - invmove < 80) {
 		return;
@@ -393,13 +396,15 @@ void hotSpellMove(int key)
 			}
 		}
 	} else if (key == VK_LEFT) {
-		if (spbslot < speedspellcount)
-			spbslot++;
+		if (spbslot >= speedspellcount - 1)
+			return;
+		spbslot++;
 		x = speedspellscoords[spbslot].x;
 		y = speedspellscoords[spbslot].y;
 	} else if (key == VK_RIGHT) {
-		if (spbslot > 0)
-			spbslot--;
+		if (spbslot <= 0)
+			return;
+		spbslot--;
 		x = speedspellscoords[spbslot].x;
 		y = speedspellscoords[spbslot].y;
 	}
@@ -433,10 +438,7 @@ void useBeltPotion(bool mana)
 	}
 	menuopenslow = ticks;
 	for (int i = 0; i < MAXBELTITEMS; i++) {
-		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) ||
-			(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) ||
-			(AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV))
-		{
+		if ((AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_HEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLHEAL && mana == false) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_MANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLMANA && mana == true) || (AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_REJUV && AllItemsList[plr[myplr].SpdList[i].IDidx].iMiscId == IMISC_FULLREJUV)) {
 			if (plr[myplr].SpdList[i]._itype > -1) {
 				invNum = i + INVITEM_BELT_FIRST;
 				UseInvItem(myplr, invNum);
@@ -490,7 +492,7 @@ void __fastcall keyboardExpension()
 			if (!checkMonstersNearby(true)) {
 				if (talktick - talkwait > 1500) { // prevent re-entering talk after finished
 					talkwait = talktick;
-						checkTownersNearby(true);
+					checkTownersNearby(true);
 				}
 			}
 		}
@@ -508,7 +510,8 @@ void __fastcall keyboardExpension()
 			return;
 		}
 		castwait = ticks;
-		RightMouseDown();
+		if (!invflag)
+			RightMouseDown();
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState(0x44) & 0x8000 && GetAsyncKeyState(0x53) & 0x8000 || leftStickY <= -0.40 && leftStickX >= 0.40) {
 		walkInDir(WALK_SE);
 	} else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState(0x57) & 0x8000 && GetAsyncKeyState(0x44) & 0x8000 || leftStickY >= 0.40 && leftStickX >= 0.40) {

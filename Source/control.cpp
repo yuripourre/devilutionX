@@ -1150,7 +1150,7 @@ void __cdecl DoSpeedBook()
 	Y = 307;
 	ssx = 600;
 	ssy = 307;
-	if (plr[myplr]._pRSpell != -1) {
+	//if (plr[myplr]._pRSpell != -1) { // JAKE: This prevents scrolls and skills from showing up on my snap cell list
 		for (i = 0; i < 4; i++) {
 			switch (i) {
 			case RSPLTYPE_SKILL:
@@ -1169,6 +1169,8 @@ void __cdecl DoSpeedBook()
 			spell = (__int64)1;
 			for (j = 1; j < MAX_SPELLS; j++) {
 				if (spell & spells) {
+				    if (plr[myplr]._pRSplType == -1 || plr[myplr]._pTSplType == -1 || plr[myplr]._pSplType == -1) // skip missing skills/spells/scrolls/charges
+					    continue;
 					if (j == plr[myplr]._pRSpell && i == plr[myplr]._pRSplType) {
 						X = xo - 36;
 						Y = yo - 188;
@@ -1195,7 +1197,7 @@ void __cdecl DoSpeedBook()
 				yo -= 56;
 			}
 		}
-	}
+	//}
 
 	SetCursorPos(X, Y);
 }
