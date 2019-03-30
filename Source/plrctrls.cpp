@@ -539,6 +539,8 @@ void __fastcall keyboardExpension()
 		if (newCurHidden) { // show cursor first, before clicking
 			SetCursor_(CURSOR_HAND);
 			newCurHidden = false;
+		} else if (spselflag) {
+			SetSpell();
 		} else {
 			LeftMouseCmd(false);
 		}
