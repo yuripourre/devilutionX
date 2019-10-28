@@ -2,6 +2,9 @@
 
 DEVILUTION_BEGIN_NAMESPACE
 
+#define TILE_WIDTH 64
+#define TILE_HEIGHT 32
+
 /**
  * Specifies the current light entry.
  */
@@ -789,15 +792,24 @@ static void scrollrt_draw_dungeon(int sx, int sy, int dx, int dy)
  * @param y dPiece coordinate
  * @param sx Back buffer coordinate
  * @param sy Back buffer coordinate
- * @param blocks Number of rows
- * @param chunks Tile in a row
+ * @param rows Number of rows
+ * @param columns Tile in a row
  */
-static void scrollrt_drawFloor(int x, int y, int sx, int sy, int blocks, int chunks)
+static void scrollrt_drawFloor(int x, int y, int sx, int sy, int rows, int columns)
 {
 	assert(gpBuffer);
 
-	for (int i = 0; i < (blocks << 1); i++) {
-		for (int j = 0; j < chunks ; j++) {
+	for (int i = 0; i < rows; i++) {
+		/*
+		if (row & 1 == 0) {
+			x -= 1;
+			y += 1;
+			sx -= 64;
+			columns += 2;
+		}
+		*/
+
+		for (int j = 0; j < columns; j++) {
 			if (x >= 0 && x < MAXDUNX && y >= 0 && y < MAXDUNY) {
 				level_piece_id = dPiece[x][y];
 				if (level_piece_id != 0) {
@@ -811,23 +823,23 @@ static void scrollrt_drawFloor(int x, int y, int sx, int sy, int blocks, int chu
 			}
 			x++;
 			y--;
-			sx += 64;
+			sx += TILE_WIDTH;
 		}
 		// Return to start of row
-		x -= chunks;
-		y += chunks;
-		sx -= chunks * 64;
-		sy += 16;
+		x -= columns;
+		y += columns;
+		sx -= columns * TILE_WIDTH;
+		sy += TILE_HEIGHT / 2;
 
 		// Jump to next row
 		if (i & 1) {
 			x++;
-			chunks--;
-			sx += 32;
+			columns--;
+			sx += TILE_WIDTH / 2;
 		} else {
 			y++;
-			chunks++;
-			sx -= 32;
+			columns++;
+			sx -= TILE_WIDTH / 2;
 		}
 	}
 }
@@ -838,22 +850,26 @@ static void scrollrt_drawFloor(int x, int y, int sx, int sy, int blocks, int chu
  * @param y dPiece coordinate
  * @param sx Back buffer coordinate
  * @param sy Back buffer coordinate
- * @param blocks Number of rows
- * @param chunks Tile in a row
+ * @param rows Number of rows
+ * @param columns Tile in a row
  */
-static void scrollrt_draw(int x, int y, int sx, int sy, int blocks, int chunks)
+static void scrollrt_draw(int x, int y, int sx, int sy, int rows, int columns)
 {
 	assert(gpBuffer);
 
-	for (int i = 0; i < (blocks << 1); i++) {
-		for (int j = 0; j < chunks ; j++) {
+	// Keep evaulating untill MicroTiles can't affect screen
+	rows += MicroTileLen;
+	memset(dRendered, 0, sizeof(dRendered));
+
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < columns ; j++) {
 			if (x >= 0 && x < MAXDUNX && y >= 0 && y < MAXDUNY) {
 				level_piece_id = dPiece[x][y];
 				if (level_piece_id != 0) {
 					if (nSolidTable[level_piece_id]) {
 						// Avoid sprites poaking through walls
-						if (x + 2 >= 0 && x + 2 < MAXDUNX && y - 1 >= 0 && y - 1 < MAXDUNY && sx + 64 <= SCREEN_X + SCREEN_WIDTH)
-							scrollrt_draw_dungeon(x + 1, y - 1, sx + 64, sy);
+						if (x + 2 >= 0 && x + 2 < MAXDUNX && y - 1 >= 0 && y - 1 < MAXDUNY && sx + TILE_WIDTH <= SCREEN_X + SCREEN_WIDTH)
+							scrollrt_draw_dungeon(x + 1, y - 1, sx + TILE_WIDTH, sy);
 						drawCell(x, y, sx, sy);
 					} else {
 						drawCellFoliage(x, y, sx, sy);
@@ -863,25 +879,66 @@ static void scrollrt_draw(int x, int y, int sx, int sy, int blocks, int chunks)
 			}
 			x++;
 			y--;
-			sx += 64;
+			sx += TILE_WIDTH;
 		}
 		// Return to start of row
-		x -= chunks;
-		y += chunks;
-		sx -= chunks * 64;
-		sy += 16;
+		x -= columns;
+		y += columns;
+		sx -= columns * TILE_WIDTH;
+		sy += TILE_HEIGHT / 2;
 
 		// Jump to next row
 		if (i & 1) {
 			x++;
-			chunks--;
-			sx += 32;
+			columns--;
+			sx += TILE_WIDTH / 2;
 		} else {
 			y++;
-			chunks++;
-			sx -= 32;
+			columns++;
+			sx -= TILE_WIDTH / 2;
 		}
 	}
+}
+
+/**
+ * @brief Scale up the rendered part of the back buffer to tak up the full view
+ */
+static void Zoom()
+{
+	int wdt = SCREEN_WIDTH / 2;
+	int nSrcOff = SCREENXY(SCREEN_WIDTH / 2 - 1, VIEWPORT_HEIGHT / 2 - 1);
+	int nDstOff = SCREENXY(SCREEN_WIDTH - 1, VIEWPORT_HEIGHT - 1);
+
+	if (PANELS_COVER) {
+		if (chrflag || questlog) {
+			wdt >>= 1;
+			nSrcOff -= wdt;
+		} else if (invflag || sbookflag) {
+			wdt >>= 1;
+			nSrcOff -= wdt;
+			nDstOff -= SPANEL_WIDTH;
+		}
+	}
+
+	BYTE *src = &gpBuffer[nSrcOff];
+	BYTE *dst = &gpBuffer[nDstOff];
+
+	for (int hgt = 0; hgt < VIEWPORT_HEIGHT / 2; hgt++) {
+		for (int i = 0; i < wdt; i++) {
+			*dst-- = *src;
+			*dst-- = *src;
+			src--;
+		}
+		memcpy(dst - BUFFER_WIDTH, dst, wdt * 2 + 1);
+		src -= BUFFER_WIDTH - wdt;
+		dst -= 2 * (BUFFER_WIDTH - wdt);
+	}
+}
+
+#define ShiftView(h, v)	\
+{						\
+	x += v + h;	        \
+	y += v - h;	        \
 }
 
 /**
@@ -891,51 +948,68 @@ static void scrollrt_draw(int x, int y, int sx, int sy, int blocks, int chunks)
  */
 static void DrawGame(int x, int y)
 {
-	int i, sx, sy, chunks, blocks;
-	int wdt, nSrcOff, nDstOff;
+	int i, sx, sy, columns, rows;
 
-	sx = (SCREEN_WIDTH % 64) / 2;
-	sy = (VIEWPORT_HEIGHT % 32) / 2;
+	sx = -((SCREEN_WIDTH % TILE_WIDTH) / 2);
+	sy = -((VIEWPORT_HEIGHT % TILE_HEIGHT) / 2);
 
 	if (zoomflag) {
-		chunks = ceil(SCREEN_WIDTH / 64);
-		blocks = ceil(VIEWPORT_HEIGHT / 32);
-
-		gpBufStart = &gpBuffer[BUFFER_WIDTH * SCREEN_Y];
+		columns = ceil(SCREEN_WIDTH / TILE_WIDTH);
+		rows = ceil(VIEWPORT_HEIGHT / (TILE_HEIGHT / 2));
+		if (columns % 2) { // Uneaven number of tiles
+			sx -= TILE_WIDTH / 2;
+			ShiftView(-1, 0);
+		}
 		gpBufEnd = &gpBuffer[BUFFER_WIDTH * (VIEWPORT_HEIGHT + SCREEN_Y)];
 	} else {
-		sy -= 32;
-
-		chunks = ceil(SCREEN_WIDTH / 2 / 64) + 1; // TODO why +1?
-		blocks = ceil(VIEWPORT_HEIGHT / 2 / 32);
-
-		gpBufStart = &gpBuffer[(-17 + SCREEN_Y) * BUFFER_WIDTH];
-		gpBufEnd = &gpBuffer[(160 + SCREEN_Y) * BUFFER_WIDTH];
+		columns = ceil(SCREEN_WIDTH / 2 / TILE_WIDTH);
+		rows = ceil(VIEWPORT_HEIGHT / 2 / (TILE_HEIGHT / 2));
+		if (columns % 2) { // Uneaven number of tiles
+			sx -= TILE_WIDTH;
+			ShiftView(-1, 0);
+		}
+		sx += TILE_WIDTH / 2;
+		sy -= TILE_HEIGHT / 2;
+		gpBufEnd = &gpBuffer[BUFFER_WIDTH * (VIEWPORT_HEIGHT / 2 + SCREEN_Y)];
 	}
+	rows++;
 
 	sx += ScrollInfo._sxoff + SCREEN_X;
 	sy += ScrollInfo._syoff + SCREEN_Y + 15;
 
 	// Center screen
-	x -= chunks;
+	ShiftView(-columns / 2, -rows / 4);
 	y--;
 
-	// Keep evaulating untill MicroTiles can't affect screen
-	blocks += ceil(MicroTileLen / 2);
+	if (SCREEN_WIDTH > PANEL_WIDTH) {
+		ShiftView(0, 2);
+	}
+
+	columns++;
+	rows++;
 
 	if (PANELS_COVER) {
 		if (zoomflag) {
 			if (chrflag || questlog) {
-				x += 2;
-				y -= 2;
+				ShiftView(2, 0);
+				columns -= 4;
 				sx += 288;
-				chunks -= 4;
 			}
 			if (invflag || sbookflag) {
-				x += 2;
-				y -= 2;
+				ShiftView(2, 0);
+				columns -= 4;
 				sx -= 32;
-				chunks -= 4;
+			}
+		} else {
+			if (chrflag || questlog) {
+				ShiftView(1, 0);
+				columns -= 2;
+				sx -= 16;
+			}
+			if (invflag || sbookflag) {
+				ShiftView(1, 0);
+				columns -= 2;
+				sx -= 16;
 			}
 		}
 	}
@@ -943,89 +1017,53 @@ static void DrawGame(int x, int y)
 	switch (ScrollInfo._sdir) {
 	case SDIR_N:
 		sy -= 32;
-		x--;
-		y--;
-		blocks++;
+		ShiftView(0, -1);
+		rows++;
 		break;
 	case SDIR_NE:
 		sy -= 32;
-		x--;
-		y--;
-		chunks++;
-		blocks++;
+		ShiftView(0, -1);
+		columns++;
+		rows++;
 		break;
 	case SDIR_E:
-		chunks++;
+		columns++;
 		break;
 	case SDIR_SE:
-		chunks++;
-		blocks++;
+		columns++;
+		rows++;
 		break;
 	case SDIR_S:
-		blocks++;
+		rows += 2;
 		break;
 	case SDIR_SW:
 		sx -= 64;
-		x--;
-		y++;
-		chunks++;
-		blocks++;
+		ShiftView(-1, 0);
+		columns++;
+		rows++;
 		break;
 	case SDIR_W:
 		sx -= 64;
-		x--;
-		y++;
-		chunks++;
+		ShiftView(-1, 0);
+		columns++;
 		break;
 	case SDIR_NW:
 		sx -= 64;
 		sy -= 32;
-		x -= 2;
-		chunks++;
-		blocks++;
+		ShiftView(-1, -1);
+		columns++;
+		rows++;
 		break;
 	}
 
-	memset(dRendered, 0, sizeof(dRendered));
-	scrollrt_drawFloor(x, y, sx, sy, blocks, chunks);
-	scrollrt_draw(x, y, sx, sy, blocks, chunks);
+	SDL_Log("%dx%d", rows, columns);
+	scrollrt_drawFloor(x, y, sx, sy, rows, columns);
+	scrollrt_draw(x, y, sx, sy, rows, columns);
 
-	gpBufStart = &gpBuffer[BUFFER_WIDTH * SCREEN_Y];
 	gpBufEnd = &gpBuffer[BUFFER_WIDTH * (SCREEN_HEIGHT + SCREEN_Y)];
 
-	if (zoomflag)
-		return;
-
-	nSrcOff = SCREENXY(32, VIEWPORT_HEIGHT / 2 - 17);
-	nDstOff = SCREENXY(0, VIEWPORT_HEIGHT - 2);
-	wdt = SCREEN_WIDTH / 2;
-	if (PANELS_COVER) {
-		if (chrflag || questlog) {
-			nSrcOff = SCREENXY(112, VIEWPORT_HEIGHT / 2 - 17);
-			nDstOff = SCREENXY(SPANEL_WIDTH, VIEWPORT_HEIGHT - 2);
-			wdt = (SCREEN_WIDTH - SPANEL_WIDTH) / 2;
-		} else if (invflag || sbookflag) {
-			nSrcOff = SCREENXY(112, VIEWPORT_HEIGHT / 2 - 17);
-			nDstOff = SCREENXY(0, VIEWPORT_HEIGHT - 2);
-			wdt = (SCREEN_WIDTH - SPANEL_WIDTH) / 2;
-		}
-	}
-
-	int hgt;
-	BYTE *src, *dst1, *dst2;
-
-	src = &gpBuffer[nSrcOff];
-	dst1 = &gpBuffer[nDstOff];
-	dst2 = &gpBuffer[nDstOff + BUFFER_WIDTH];
-
-	for (hgt = VIEWPORT_HEIGHT / 2; hgt != 0; hgt--, src -= BUFFER_WIDTH + wdt, dst1 -= 2 * (BUFFER_WIDTH + wdt), dst2 -= 2 * (BUFFER_WIDTH + wdt)) {
-		for (i = wdt; i != 0; i--) {
-			*dst1++ = *src;
-			*dst1++ = *src;
-			*dst2++ = *src;
-			*dst2++ = *src;
-			src++;
-		}
+	if (!zoomflag) {
+		Zoom();
 	}
 }
 
