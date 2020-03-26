@@ -524,43 +524,10 @@ static void drawCell(int x, int y, int sx, int sy)
 	BYTE *dst;
 	MICROS *pMap;
 
-	light_table_index = dLight[x][y];
-
 	dst = &gpBuffer[sx + sy * BUFFER_WIDTH];
 	pMap = &dpiece_defs_map_2[x][y];
 	cel_transparency_active = (BYTE)(nTransTable[level_piece_id] & TransList[dTransVal[x][y]]);
-	for (int i = 0; i<MicroTileLen>> 1; i++) {
-		arch_draw_type = i == 0 ? 1 : 0;
-		level_cel_block = pMap->mt[2 * i];
-		if (level_cel_block != 0) {
-			RenderTile(dst);
-		}
-		arch_draw_type = i == 0 ? 2 : 0;
-		level_cel_block = pMap->mt[2 * i + 1];
-		if (level_cel_block != 0) {
-			RenderTile(dst + 32);
-		}
-		dst -= BUFFER_WIDTH * 32;
-	}
-}
-
-/**
- * @brief Render grass and leafs
- * @param x dPiece coordinate
- * @param y dPiece coordinate
- * @param sx Back buffer coordinate
- * @param sy Back buffer coordinate
- */
-static void drawCellFoliage(int x, int y, int sx, int sy)
-{
-	BYTE *dst;
-	MICROS *pMap;
-
-	light_table_index = dLight[x][y];
-	dst = &gpBuffer[sx + sy * BUFFER_WIDTH];
-	pMap = &dpiece_defs_map_2[x][y];
-	cel_transparency_active = (BYTE)(nTransTable[level_piece_id] & TransList[dTransVal[x][y]]);
-	cel_foliage_active = true;
+	cel_foliage_active = !nSolidTable[level_piece_id];
 	for (int i = 0; i<MicroTileLen>> 1; i++) {
 		level_cel_block = pMap->mt[2 * i];
 		if (level_cel_block != 0) {
@@ -716,12 +683,9 @@ static void scrollrt_draw_dungeon(int sx, int sy, int dx, int dy)
 	assert((DWORD)sx < MAXDUNX);
 	assert((DWORD)sy < MAXDUNY);
 
-	if (dRendered[sx][sy])
-		return;
-
-	dRendered[sx][sy] = true;
-
 	light_table_index = dLight[sx][sy];
+
+	drawCell(sx, sy, dx, dy);
 
 	bFlag = dFlags[sx][sy];
 	bDead = dDead[sx][sy];
@@ -856,15 +820,23 @@ static void scrollrt_draw(int x, int y, int sx, int sy, int blocks, int chunks)
 			if (x >= 0 && x < MAXDUNX && y >= 0 && y < MAXDUNY) {
 				level_piece_id = dPiece[x][y];
 				if (level_piece_id != 0) {
-					if (nSolidTable[level_piece_id]) {
-						// Avoid sprites poaking through walls
-						if (x + 2 >= 0 && x + 2 < MAXDUNX && y - 1 >= 0 && y - 1 < MAXDUNY && sx + 64 <= SCREEN_X + SCREEN_WIDTH)
-							scrollrt_draw_dungeon(x + 1, y - 1, sx + 64, sy);
-						drawCell(x, y, sx, sy);
-					} else {
-						drawCellFoliage(x, y, sx, sy);
+					if (nSolidTable[level_piece_id] || dArch[x][y] != 0) {
+						// Render objects behind wall first to prevent sprites, that are moving
+						// between tiles, from poking through the walls as they exceed the tile bound.
+						// A propper fix for this would probably be to layout the sceen and render by
+						// sprite screen position rather then tile position.
+						if (x + 1 < MAXDUNX && y - 1 >= 0 && sx + 64 <= SCREEN_X + SCREEN_WIDTH) {
+							if (nSolidTable[dPiece[x + 1][y]] || dArch[x + 1][y] != 0) {
+								level_piece_id = dPiece[x + 1][y - 1];
+								scrollrt_draw_dungeon(x + 1, y - 1, sx + 64, sy);
+								dRendered[x + 1][y - 1] = true;
+								level_piece_id = dPiece[x][y];
+							}
+						}
 					}
-					scrollrt_draw_dungeon(x, y, sx, sy);
+					if (nSolidTable[level_piece_id] || !dRendered[x][y]) {
+						scrollrt_draw_dungeon(x, y, sx, sy);
+					}
 				}
 			}
 			x++;
