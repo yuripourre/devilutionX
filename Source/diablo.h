@@ -34,6 +34,19 @@ typedef struct AudioOptions {
 	bool bAutoEquipSound;
 } AudioOptions;
 
+typedef struct ControlsOptions {
+	/** @brief Enable alternative joystick mapping (at least 2 axis and 8 buttons). */
+	bool bJoystickMapping;
+	Sint32 bJoyButtonA;
+	Sint32 bJoyButtonB;
+	Sint32 bJoyButtonX;
+	Sint32 bJoyButtonY;
+	Sint32 bJoyButtonL1;
+	Sint32 bJoyButtonR1;
+	Sint32 bJoyButtonL2;
+	Sint32 bJoyButtonR2;
+} ControlsOptions;
+
 typedef struct GraphicsOptions {
 	/** @brief Render width. */
 	Sint32 nWidth;
@@ -111,6 +124,7 @@ typedef struct NetworkOptions {
 
 typedef struct Options {
 	AudioOptions Audio;
+	ControlsOptions Controls;
 	GameplayOptions Gameplay;
 	GraphicsOptions Graphics;
 	NetworkOptions Network;

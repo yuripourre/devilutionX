@@ -139,6 +139,7 @@ bool ProcessControllerMotion(const SDL_Event &event, ControllerButtonEvent ctrl_
 		ScaleJoysticks();
 		return true;
 	}
+
 #if HAS_KBCTRL == 1
 	if (ProcessKbCtrlAxisMotion(event))
 		return true;

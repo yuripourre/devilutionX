@@ -409,6 +409,16 @@ static void SaveOptions()
 	setIniInt("Audio", "Walking Sound", sgOptions.Audio.bWalkingSound);
 	setIniInt("Audio", "Auto Equip Sound", sgOptions.Audio.bAutoEquipSound);
 
+	setIniInt("Controls", "Enable Joystick Mapping", sgOptions.Controls.bJoystickMapping);
+	setIniInt("Controls", "Joystick Button A", sgOptions.Controls.bJoyButtonA);
+	setIniInt("Controls", "Joystick Button B", sgOptions.Controls.bJoyButtonB);
+	setIniInt("Controls", "Joystick Button X", sgOptions.Controls.bJoyButtonX);
+	setIniInt("Controls", "Joystick Button Y", sgOptions.Controls.bJoyButtonY);
+	setIniInt("Controls", "Joystick Button L1", sgOptions.Controls.bJoyButtonL1);
+	setIniInt("Controls", "Joystick Button R1", sgOptions.Controls.bJoyButtonR1);
+	setIniInt("Controls", "Joystick Button L2", sgOptions.Controls.bJoyButtonL2);
+	setIniInt("Controls", "Joystick Button R2", sgOptions.Controls.bJoyButtonR2);
+
 #ifndef __vita__
 	setIniInt("Graphics", "Width", sgOptions.Graphics.nWidth);
 	setIniInt("Graphics", "Height", sgOptions.Graphics.nHeight);
@@ -459,6 +469,16 @@ static void LoadOptions()
 	sgOptions.Audio.nMusicVolume = getIniInt("Audio", "Music Volume", VOLUME_MAX);
 	sgOptions.Audio.bWalkingSound = getIniBool("Audio", "Walking Sound", true);
 	sgOptions.Audio.bAutoEquipSound = getIniBool("Audio", "Auto Equip Sound", false);
+
+	sgOptions.Controls.bJoystickMapping = getIniBool("Controls", "Enable Joystick Mapping", false);
+	sgOptions.Controls.bJoyButtonA = getIniInt("Controls", "Joystick Button A", 0);
+	sgOptions.Controls.bJoyButtonB = getIniInt("Controls", "Joystick Button B", 1);
+	sgOptions.Controls.bJoyButtonX = getIniInt("Controls", "Joystick Button X", 2);
+	sgOptions.Controls.bJoyButtonY = getIniInt("Controls", "Joystick Button Y", 3);
+	sgOptions.Controls.bJoyButtonL1 = getIniInt("Controls", "Joystick Button L1", 4);
+    sgOptions.Controls.bJoyButtonR1 = getIniInt("Controls", "Joystick Button R1", 5);
+    sgOptions.Controls.bJoyButtonL2 = getIniInt("Controls", "Joystick Button L2", 6);
+	sgOptions.Controls.bJoyButtonR2 = getIniInt("Controls", "Joystick Button R2", 7);
 
 #ifndef __vita__
 	sgOptions.Graphics.nWidth = getIniInt("Graphics", "Width", DEFAULT_WIDTH);

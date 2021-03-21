@@ -5,6 +5,7 @@
 
 #include "controls/controller_motion.h"
 #include "stubs.h"
+#include "all.h"
 
 // Defined in SourceX/controls/plctrls.cpp
 extern "C" bool sgbControllerActive;
@@ -15,6 +16,32 @@ std::vector<Joystick> *const Joystick::joysticks_ = new std::vector<Joystick>;
 
 ControllerButton Joystick::ToControllerButton(const SDL_Event &event) const
 {
+	// TODO REFACTOR THIS MOVE TO ANOTHER METHOD
+	if (sgOptions.Controls.bJoystickMapping) {
+		switch (event.type) {
+			case SDL_JOYBUTTONDOWN:
+			case SDL_JOYBUTTONUP:
+				if (event.jbutton.button == sgOptions.Controls.bJoyButtonA) {
+					return ControllerButton_BUTTON_A;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonB) {
+                    return ControllerButton_BUTTON_B;
+                } else if (event.jbutton.button == sgOptions.Controls.bJoyButtonX) {
+                    return ControllerButton_BUTTON_X;
+                } else if (event.jbutton.button == sgOptions.Controls.bJoyButtonY) {
+                    return ControllerButton_BUTTON_Y;
+                } else if (event.jbutton.button == sgOptions.Controls.bJoyButtonL1) {
+					return ControllerButton_BUTTON_LEFTSHOULDER;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonR1) {
+                    return ControllerButton_BUTTON_RIGHTSHOULDER;
+                } else if (event.jbutton.button == sgOptions.Controls.bJoyButtonL2) {
+                    return ControllerButton_AXIS_TRIGGERLEFT;
+                } else if (event.jbutton.button == sgOptions.Controls.bJoyButtonR2) {
+                    return ControllerButton_AXIS_TRIGGERRIGHT;
+                }
+			 break;
+		}
+	}
+
 	switch (event.type) {
 	case SDL_JOYBUTTONDOWN:
 	case SDL_JOYBUTTONUP:
@@ -22,6 +49,7 @@ ControllerButton Joystick::ToControllerButton(const SDL_Event &event) const
 #ifdef JOY_BUTTON_A
 		case JOY_BUTTON_A:
 			return ControllerButton_BUTTON_A;
+
 #endif
 #ifdef JOY_BUTTON_B
 		case JOY_BUTTON_B:
@@ -216,6 +244,20 @@ bool Joystick::ProcessAxisMotion(const SDL_Event &event)
 {
 	if (event.type != SDL_JOYAXISMOTION)
 		return false;
+
+	// TODO REFACTORING MOVE TO EXTRACT METHOD
+	if (sgOptions.Controls.bJoystickMapping) {
+		if (event.jaxis.axis == 0) {
+			leftStickXUnscaled = event.jaxis.value;
+			leftStickNeedsScaling = true;
+			return true;
+		} else if (event.jaxis.axis == 1) {
+			leftStickYUnscaled = -event.jaxis.value;
+			leftStickNeedsScaling = true;
+			return true;
+		}
+	}
+
 	switch (event.jaxis.axis) {
 #ifdef JOY_AXIS_LEFTX
 	case JOY_AXIS_LEFTX:
@@ -241,7 +283,8 @@ bool Joystick::ProcessAxisMotion(const SDL_Event &event)
 		rightStickNeedsScaling = true;
 		break;
 #endif
-	default:
+    default:
+
 		return false;
 	}
 	return true;
