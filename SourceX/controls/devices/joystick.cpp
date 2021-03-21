@@ -17,7 +17,7 @@ std::vector<Joystick> *const Joystick::joysticks_ = new std::vector<Joystick>;
 ControllerButton Joystick::ToControllerButton(const SDL_Event &event) const
 {
 	// TODO REFACTOR THIS MOVE TO ANOTHER METHOD
-	if (sgOptions.Controls.bJoystickMapping) {
+	/*if (sgOptions.Controls.bJoystickMapping) {
 		switch (event.type) {
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
@@ -40,7 +40,7 @@ ControllerButton Joystick::ToControllerButton(const SDL_Event &event) const
                 }
 			 break;
 		}
-	}
+	}*/
 
 	switch (event.type) {
 	case SDL_JOYBUTTONDOWN:
@@ -245,15 +245,15 @@ bool Joystick::ProcessAxisMotion(const SDL_Event &event)
 	if (event.type != SDL_JOYAXISMOTION)
 		return false;
 
-	// TODO REFACTORING MOVE TO EXTRACT METHOD
+	// TODO: REFACTORING MOVE TO EXTRACT METHOD
 	if (sgOptions.Controls.bJoystickMapping) {
 		if (event.jaxis.axis == 0) {
-			leftStickXUnscaled = event.jaxis.value;
-			leftStickNeedsScaling = true;
+			gamepad.leftStickXUnscaled = event.jaxis.value;
+			gamepad.leftStickNeedsScaling = true;
 			return true;
 		} else if (event.jaxis.axis == 1) {
-			leftStickYUnscaled = -event.jaxis.value;
-			leftStickNeedsScaling = true;
+			gamepad.leftStickYUnscaled = -event.jaxis.value;
+			gamepad.leftStickNeedsScaling = true;
 			return true;
 		}
 	}

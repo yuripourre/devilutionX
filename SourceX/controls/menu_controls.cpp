@@ -26,9 +26,19 @@ MenuAction GetMenuAction(const SDL_Event &event)
 {
 	const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(event);
 
-	if (ProcessControllerMotion(event, ctrl_event)) {
-		sgbControllerActive = true;
-		return GetMenuHeldUpDownAction();
+	if (!sgOptions.Controls.bJoystickMapping) {
+		if (ProcessControllerMotion(event, ctrl_event)) {
+			sgbControllerActive = true;
+			return GetMenuHeldUpDownAction();
+		}
+	} else {
+		// TODO: Handle axis
+		// TODO: Handle menu actions new joystick
+		if (gamepad.buttonA) {
+			return MenuAction_SELECT;
+		} else {
+			return MenuAction_BACK;
+		}
 	}
 
 	if (ctrl_event.button != ControllerButton_NONE)

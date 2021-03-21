@@ -301,6 +301,106 @@ bool BlurInventory()
 	return true;
 }
 
+bool GetActionResult(const SDL_Event &event, GameAction *action) {
+
+	if (!sgOptions.Controls.bJoystickMapping) {
+		const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(event);
+		if (ProcessControllerMotion(event, ctrl_event)) {
+			return GetGameAction(event, ctrl_event, action);
+		}
+	} else {
+	    // TODO HANDLE AXIS
+
+        // TODO: DEFINE CUSTOM HANDLER HERE
+        // Basically modify the gamepad status
+        // Based on delta (if a wasn't pressed and now it is pressed, generate action
+
+		//L2+A = Char
+		//L2+B = Quest (request focus)
+		//L2+X = Map
+		//L2+Y = Friendly / PK
+
+		//R2+A = Inventory (request focus)
+		//R2+B = Spells (request focus)
+		//R2+X = Spell book(request focus)
+		//R2+Y = Message (Request keyboard)
+		SDL_Log("EVENT: %d", event.type);
+		switch (event.type) {
+			case SDL_JOYBUTTONDOWN:
+				SDL_Log("SDL_JOYBUTTONDOWN: %d", event.type);
+				if (event.jbutton.button == sgOptions.Controls.bJoyButtonA) {
+					gamepad.buttonA = true;
+
+					SDL_Log("InGameMenu? %d", InGameMenu());
+					if (InGameMenu()) {
+						*action = GameActionSendKey{ DVL_VK_RETURN, true };
+					} else {
+						*action = GameAction(GameActionType_PRIMARY_ACTION);
+					}
+
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonL2) {
+					gamepad.buttonL2 = true;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonR2) {
+					gamepad.buttonR2 = true;
+					//*action = GameAction(GameActionType_NONE);
+    				return true;
+				}
+			case SDL_JOYBUTTONUP:
+				if (event.jbutton.button == sgOptions.Controls.bJoyButtonA) {
+					gamepad.buttonA = false;
+					if (gamepad.buttonL2) {
+						// Open Character info
+	        			*action = GameAction(GameActionType_TOGGLE_CHARACTER_INFO);
+						return true;
+					} else if (gamepad.buttonR2) {
+						// Open Inventory
+						*action = GameAction(GameActionType_TOGGLE_INVENTORY);
+						return true;
+					}
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonB) {
+					gamepad.buttonB = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonX) {
+					gamepad.buttonX = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonY) {
+					gamepad.buttonY = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonL1) {
+					gamepad.buttonL1 = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonR1) {
+					gamepad.buttonR1 = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				}  else if (event.jbutton.button == sgOptions.Controls.bJoyButtonL2) {
+				  	gamepad.buttonL2 = false;
+				  	//*action = GameAction(GameActionType_NONE);
+					return true;
+				} else if (event.jbutton.button == sgOptions.Controls.bJoyButtonR2) {
+					gamepad.buttonR2 = false;
+					//*action = GameAction(GameActionType_NONE);
+					return true;
+				}
+			 break;
+		}
+
+		const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(event);
+		if (ProcessControllerMotion(event, ctrl_event)) {
+			return GetGameAction(event, ctrl_event, action);
+		}
+	}
+	*action = GameAction(GameActionType_NONE);
+	return false;
+}
+
 bool FetchMessage(LPMSG lpMsg)
 {
 #ifdef __SWITCH__
@@ -347,12 +447,10 @@ bool FetchMessage(LPMSG lpMsg)
 	if (HandleControllerAddedOrRemovedEvent(e))
 		return true;
 
-	const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(e);
-	if (ProcessControllerMotion(e, ctrl_event))
-		return true;
-
 	GameAction action;
-	if (GetGameAction(e, ctrl_event, &action)) {
+
+	if (GetActionResult(e, &action)) {
+		SDL_Log("Action: %d", action.type);
 		if (action.type != GameActionType_NONE) {
 			sgbControllerActive = true;
 
