@@ -754,7 +754,7 @@ static BOOL LeftMouseDown(int wParam)
 	}
 
 	if (spselflag) {
-		SetSpell();
+		SetSpell(myplr);
 		return FALSE;
 	}
 
@@ -773,7 +773,7 @@ static BOOL LeftMouseDown(int wParam)
 				qtextflag = FALSE;
 				stream_stop();
 			} else if (chrflag && MouseX < SPANEL_WIDTH && MouseY < SPANEL_HEIGHT) {
-				CheckChrBtns();
+				CheckChrBtns(myplr);
 			} else if (invflag && MouseX > RIGHT_PANEL && MouseY < SPANEL_HEIGHT) {
 				if (!dropGoldFlag)
 					CheckInvItem(isShiftHeld);
@@ -810,7 +810,7 @@ static void LeftMouseUp(int wParam)
 	if (panbtndown)
 		CheckBtnUp();
 	if (chrbtnactive)
-		ReleaseChrBtns(isShiftHeld);
+		ReleaseChrBtns(myplr, isShiftHeld);
 	if (lvlbtndown)
 		ReleaseLvlBtn();
 	if (stextflag != STORE_NONE)
@@ -824,14 +824,14 @@ static void RightMouseDown()
 			doom_close();
 		} else if (stextflag == STORE_NONE) {
 			if (spselflag) {
-				SetSpell();
+				SetSpell(myplr);
 			} else if (MouseY >= SPANEL_HEIGHT
 			    || (!sbookflag || MouseX <= RIGHT_PANEL)
 			        && !TryIconCurs()
 			        && (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))) {
 				if (pcurs == CURSOR_HAND) {
 					if (pcursinvitem == -1 || !UseInvItem(myplr, pcursinvitem))
-						CheckPlrSpell();
+						CheckPlrSpell(myplr);
 				} else if (pcurs > CURSOR_HAND && pcurs < CURSOR_FIRSTITEM) {
 					NewCursor(CURSOR_HAND);
 				}
@@ -1067,31 +1067,31 @@ static void PressKey(int vkey)
 #endif
 	else if (vkey == DVL_VK_F5) {
 		if (spselflag) {
-			SetSpeedSpell(0);
+			SetSpeedSpell(myplr, 0);
 			return;
 		}
-		ToggleSpell(0);
+		ToggleSpell(myplr, 0);
 		return;
 	} else if (vkey == DVL_VK_F6) {
 		if (spselflag) {
-			SetSpeedSpell(1);
+			SetSpeedSpell(myplr, 1);
 			return;
 		}
-		ToggleSpell(1);
+		ToggleSpell(myplr, 1);
 		return;
 	} else if (vkey == DVL_VK_F7) {
 		if (spselflag) {
-			SetSpeedSpell(2);
+			SetSpeedSpell(myplr, 2);
 			return;
 		}
-		ToggleSpell(2);
+		ToggleSpell(myplr, 2);
 		return;
 	} else if (vkey == DVL_VK_F8) {
 		if (spselflag) {
-			SetSpeedSpell(3);
+			SetSpeedSpell(myplr, 3);
 			return;
 		}
-		ToggleSpell(3);
+		ToggleSpell(myplr, 3);
 		return;
 	} else if (vkey == DVL_VK_F9) {
 		diablo_hotkey_msg(0);
@@ -1258,7 +1258,7 @@ static void PressChar(WPARAM vkey)
 			invflag = FALSE;
 			sbookflag = FALSE;
 			if (!spselflag) {
-				DoSpeedBook();
+				DoSpeedBook(myplr);
 			} else {
 				spselflag = FALSE;
 			}

@@ -51,7 +51,7 @@ DWORD translate_controller_button_to_key(ControllerButton controller_button)
 
 bool HandleStartAndSelect(const ControllerButtonEvent &ctrl_event, GameAction *action)
 {
-	const bool in_game_menu = InGameMenu();
+	const bool in_game_menu = InGameMenu(myplr);
 
 	const bool start_is_down = IsControllerButtonPressed(ControllerButton_BUTTON_START);
 	const bool select_is_down = IsControllerButtonPressed(ControllerButton_BUTTON_BACK);
@@ -95,7 +95,7 @@ bool HandleStartAndSelect(const ControllerButtonEvent &ctrl_event, GameAction *a
 
 bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, GameAction *action)
 {
-	const bool in_game_menu = InGameMenu();
+	const bool in_game_menu = InGameMenu(myplr);
 
 	if (HandleStartAndSelect(ctrl_event, action))
 		return true;

@@ -223,6 +223,8 @@ const char *const PanBtnStr[8] = {
 	"Player Attack"
 };
 /** Maps from attribute_id to the rectangle on screen used for attribute increment buttons. */
+// TODO!
+//RECT32 ChrBtnsRect[MAX_PLAYERS][4] = {
 RECT32 ChrBtnsRect[4] = {
 	{ 137, 138, 41, 22 },
 	{ 137, 166, 41, 22 },
@@ -478,57 +480,57 @@ void DrawSpellList(CelOutputBuffer out)
 	}
 }
 
-void SetSpell()
+void SetSpell(int pnum)
 {
 	spselflag = FALSE;
 	if (pSpell != SPL_INVALID) {
 		ClearPanel();
-		plr[myplr]._pRSpell = pSpell;
-		plr[myplr]._pRSplType = pSplType;
+		plr[pnum]._pRSpell = pSpell;
+		plr[pnum]._pRSplType = pSplType;
 		force_redraw = 255;
 	}
 }
 
-void SetSpeedSpell(int slot)
+void SetSpeedSpell(int pnum, int slot)
 {
 	if (pSpell != SPL_INVALID) {
 		for (int i = 0; i < 4; ++i) {
-			if (plr[myplr]._pSplHotKey[i] == pSpell && plr[myplr]._pSplTHotKey[i] == pSplType)
-				plr[myplr]._pSplHotKey[i] = SPL_INVALID;
+			if (plr[pnum]._pSplHotKey[i] == pSpell && plr[myplr]._pSplTHotKey[i] == pSplType)
+				plr[pnum]._pSplHotKey[i] = SPL_INVALID;
 		}
-		plr[myplr]._pSplHotKey[slot] = pSpell;
-		plr[myplr]._pSplTHotKey[slot] = pSplType;
+		plr[pnum]._pSplHotKey[slot] = pSpell;
+		plr[pnum]._pSplTHotKey[slot] = pSplType;
 	}
 }
 
-void ToggleSpell(int slot)
+void ToggleSpell(int pnum, int slot)
 {
 	Uint64 spells;
 
-	if (plr[myplr]._pSplHotKey[slot] == SPL_INVALID) {
+	if (plr[pnum]._pSplHotKey[slot] == SPL_INVALID) {
 		return;
 	}
 
-	switch (plr[myplr]._pSplTHotKey[slot]) {
+	switch (plr[pnum]._pSplTHotKey[slot]) {
 	case RSPLTYPE_SKILL:
-		spells = plr[myplr]._pAblSpells;
+		spells = plr[pnum]._pAblSpells;
 		break;
 	case RSPLTYPE_SPELL:
-		spells = plr[myplr]._pMemSpells;
+		spells = plr[pnum]._pMemSpells;
 		break;
 	case RSPLTYPE_SCROLL:
-		spells = plr[myplr]._pScrlSpells;
+		spells = plr[pnum]._pScrlSpells;
 		break;
 	case RSPLTYPE_CHARGES:
-		spells = plr[myplr]._pISpells;
+		spells = plr[pnum]._pISpells;
 		break;
 	case RSPLTYPE_INVALID:
 		return;
 	}
 
-	if (spells & GetSpellBitmask(plr[myplr]._pSplHotKey[slot])) {
-		plr[myplr]._pRSpell = plr[myplr]._pSplHotKey[slot];
-		plr[myplr]._pRSplType = plr[myplr]._pSplTHotKey[slot];
+	if (spells & GetSpellBitmask(plr[pnum]._pSplHotKey[slot])) {
+		plr[myplr]._pRSpell = plr[pnum]._pSplHotKey[slot];
+		plr[myplr]._pRSplType = plr[pnum]._pSplTHotKey[slot];
 		force_redraw = 255;
 	}
 }
@@ -867,7 +869,7 @@ void DrawCtrlBtns(CelOutputBuffer out)
  * Draws the "Speed Book": the rows of known spells for quick-setting a spell that
  * show up when you click the spell slot at the control panel.
  */
-void DoSpeedBook()
+void DoSpeedBook(int pnum)
 {
 	int xo, yo, X, Y, i, j;
 
@@ -877,27 +879,27 @@ void DoSpeedBook()
 	X = xo + SPLICONLENGTH / 2;
 	Y = yo - SPLICONLENGTH / 2;
 
-	if (plr[myplr]._pRSpell != SPL_INVALID) {
+	if (plr[pnum]._pRSpell != SPL_INVALID) {
 		for (i = 0; i < 4; i++) {
 			Uint64 spells;
 			switch (i) {
 			case RSPLTYPE_SKILL:
-				spells = plr[myplr]._pAblSpells;
+				spells = plr[pnum]._pAblSpells;
 				break;
 			case RSPLTYPE_SPELL:
-				spells = plr[myplr]._pMemSpells;
+				spells = plr[pnum]._pMemSpells;
 				break;
 			case RSPLTYPE_SCROLL:
-				spells = plr[myplr]._pScrlSpells;
+				spells = plr[pnum]._pScrlSpells;
 				break;
 			case RSPLTYPE_CHARGES:
-				spells = plr[myplr]._pISpells;
+				spells = plr[pnum]._pISpells;
 				break;
 			}
 			Uint64 spell = 1;
 			for (j = 1; j < MAX_SPELLS; j++) {
 				if (spell & spells) {
-					if (j == plr[myplr]._pRSpell && i == plr[myplr]._pRSplType) {
+					if (j == plr[pnum]._pRSpell && i == plr[pnum]._pRSplType) {
 						X = xo + SPLICONLENGTH / 2;
 						Y = yo - SPLICONLENGTH / 2;
 					}
@@ -946,7 +948,7 @@ void DoPanBtn()
 			force_redraw = 255;
 			return;
 		}
-		DoSpeedBook();
+		DoSpeedBook(myplr);
 		gamemenu_off();
 	}
 }
@@ -1611,7 +1613,7 @@ void DrawLevelUpIcon(CelOutputBuffer out)
 	}
 }
 
-void CheckChrBtns()
+void CheckChrBtns(int myplr)
 {
 	int i, x, y;
 
@@ -1651,7 +1653,7 @@ void CheckChrBtns()
 	}
 }
 
-void ReleaseChrBtns(bool addAllStatPoints)
+void ReleaseChrBtns(int myplr, bool addAllStatPoints)
 {
 	int i;
 

@@ -3698,7 +3698,7 @@ void MakePlrPath(int pnum, int xx, int yy, BOOL endspace)
 	plr[pnum].walkpath[path] = WALK_NONE;
 }
 
-void CheckPlrSpell()
+void CheckPlrSpell(int myplr)
 {
 	BOOL addflag = FALSE;
 	int rspell, sd, sl;
@@ -3768,10 +3768,10 @@ void CheckPlrSpell()
 		addflag = CheckSpell(myplr, rspell, plr[myplr]._pRSplType, FALSE);
 		break;
 	case RSPLTYPE_SCROLL:
-		addflag = UseScroll();
+		addflag = UseScroll(myplr);
 		break;
 	case RSPLTYPE_CHARGES:
-		addflag = UseStaff();
+		addflag = UseStaff(myplr);
 		break;
 	case RSPLTYPE_INVALID:
 		return;

@@ -27,14 +27,14 @@ TEST(Inv, UseScroll_from_inventory)
 {
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr]._pNumInv = 5;
-	EXPECT_TRUE(dvl::UseScroll());
+	EXPECT_TRUE(dvl::UseScroll(dvl::myplr));
 }
 
 // Test that the scroll is used in the belt in correct conditions
 TEST(Inv, UseScroll_from_belt)
 {
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
-	EXPECT_TRUE(dvl::UseScroll());
+	EXPECT_TRUE(dvl::UseScroll(dvl::myplr));
 }
 
 // Test that the scroll is not used in the inventory for each invalid condition
@@ -47,7 +47,7 @@ TEST(Inv, UseScroll_from_inventory_invalid_conditions)
 
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::pcurs = dvl::CURSOR_IDENTIFY;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::leveltype = dvl::DTYPE_TOWN;
@@ -55,15 +55,15 @@ TEST(Inv, UseScroll_from_inventory_invalid_conditions)
 
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr]._pRSpell = static_cast<dvl::spell_id>(dvl::SPL_HEAL);
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr].InvList[2]._iMiscId = dvl::IMISC_STAFF;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].InvList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr].InvList[2]._itype = dvl::ITYPE_NONE;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 }
 
 // Test that the scroll is not used in the belt for each invalid condition
@@ -74,23 +74,23 @@ TEST(Inv, UseScroll_from_belt_invalid_conditions)
 
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
 	dvl::pcurs = dvl::CURSOR_IDENTIFY;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
 	dvl::leveltype = dvl::DTYPE_TOWN;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr]._pRSpell = static_cast<dvl::spell_id>(dvl::SPL_HEAL);
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr].SpdList[2]._iMiscId = dvl::IMISC_STAFF;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 
 	set_up_scroll(dvl::plr[dvl::myplr].SpdList[2], dvl::SPL_FIREBOLT);
 	dvl::plr[dvl::myplr].SpdList[2]._itype = dvl::ITYPE_NONE;
-	EXPECT_FALSE(dvl::UseScroll());
+	EXPECT_FALSE(dvl::UseScroll(dvl::myplr));
 }
 
 // Test gold calculation

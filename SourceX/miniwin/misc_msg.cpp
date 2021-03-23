@@ -280,7 +280,7 @@ bool false_avail(const char *name, int value)
 bool BlurInventory()
 {
 	if (pcurs >= CURSOR_FIRSTITEM) {
-		if (!TryDropItem()) {
+		if (!TryDropItem(myplr)) {
 			if (plr[myplr]._pClass == PC_WARRIOR) {
 				PlaySFX(PS_WARR16); // "Where would I put this?"
 			} else if (plr[myplr]._pClass == PC_ROGUE) {
@@ -368,30 +368,30 @@ bool FetchMessage(LPMSG lpMsg)
 		case GameActionType_NONE:
 			break;
 		case GameActionType_USE_HEALTH_POTION:
-			UseBeltItem(BLT_HEALING);
+			UseBeltItem(myplr, BLT_HEALING);
 			break;
 		case GameActionType_USE_MANA_POTION:
-			UseBeltItem(BLT_MANA);
+			UseBeltItem(myplr, BLT_MANA);
 			break;
 		case GameActionType_PRIMARY_ACTION:
-			PerformPrimaryAction();
+			PerformPrimaryAction(myplr);
 			break;
 		case GameActionType_SECONDARY_ACTION:
-			PerformSecondaryAction();
+			PerformSecondaryAction(myplr);
 			break;
 		case GameActionType_CAST_SPELL:
-			PerformSpellAction();
+			PerformSpellAction(myplr);
 			break;
 		case GameActionType_TOGGLE_QUICK_SPELL_MENU:
 			if (!invflag || BlurInventory()) {
 				if (!spselflag)
-					DoSpeedBook();
+					DoSpeedBook(myplr);
 				else
 					spselflag = false;
 				chrflag = false;
 				questlog = false;
 				sbookflag = false;
-				StoreSpellCoords();
+				StoreSpellCoords(myplr);
 			}
 			break;
 		case GameActionType_TOGGLE_CHARACTER_INFO:

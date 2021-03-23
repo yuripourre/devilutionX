@@ -48,9 +48,9 @@ extern BOOL panbtndown;
 extern BOOL spselflag;
 
 void DrawSpellList(CelOutputBuffer out);
-void SetSpell();
-void SetSpeedSpell(int slot);
-void ToggleSpell(int slot);
+void SetSpell(int pnum);
+void SetSpeedSpell(int pnum, int slot);
+void ToggleSpell(int pnum, int slot);
 
 /**
  * @brief Print letter to the given buffer
@@ -97,7 +97,7 @@ void DrawCtrlPan(CelOutputBuffer out);
  */
 void DrawCtrlBtns(CelOutputBuffer out);
 
-void DoSpeedBook();
+void DoSpeedBook(int pnum);
 void DoPanBtn();
 void control_check_btn_press();
 void DoAutoMap();
@@ -116,8 +116,8 @@ void DrawChr(CelOutputBuffer out);
 void CheckLvlBtn();
 void ReleaseLvlBtn();
 void DrawLevelUpIcon(CelOutputBuffer out);
-void CheckChrBtns();
-void ReleaseChrBtns(bool addAllStatPoints);
+void CheckChrBtns(int pnum);
+void ReleaseChrBtns(int pnum, bool addAllStatPoints);
 void DrawDurIcon(CelOutputBuffer out);
 void RedBack(CelOutputBuffer out);
 void DrawSpellBook(CelOutputBuffer out);

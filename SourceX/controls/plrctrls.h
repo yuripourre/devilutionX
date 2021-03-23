@@ -26,7 +26,7 @@ void plrctrls_after_check_curs_move();
 void HandleRightStickMotion();
 
 // Whether we're in a dialog menu that the game handles natively with keyboard controls.
-bool InGameMenu();
+bool InGameMenu(int pnum);
 
 // Whether the automap is being displayed.
 bool IsAutomapActive();
@@ -34,17 +34,17 @@ bool IsAutomapActive();
 // Whether the mouse cursor is being moved with the controller.
 bool IsMovingMouseCursorWithController();
 
-void UseBeltItem(int type);
+void UseBeltItem(int pnum, int type);
 
 // Talk to towners, click on inv items, attack, etc.
-void PerformPrimaryAction();
+void PerformPrimaryAction(int pnum);
 
 // Open chests, doors, pickup items.
-void PerformSecondaryAction();
-bool TryDropItem();
+void PerformSecondaryAction(int pnum);
+bool TryDropItem(int pnum);
 void FocusOnInventory();
-void PerformSpellAction();
-void StoreSpellCoords();
+void PerformSpellAction(int pnum);
+void StoreSpellCoords(int pnum);
 
 typedef struct coords {
 	int x;

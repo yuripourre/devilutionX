@@ -2628,7 +2628,7 @@ void RemoveScroll(int pnum)
 	}
 }
 
-BOOL UseScroll()
+BOOL UseScroll(int myplr)
 {
 	int i;
 
@@ -2668,13 +2668,13 @@ void UseStaffCharge(int pnum)
 	}
 }
 
-BOOL UseStaff()
+BOOL UseStaff(int pnum)
 {
 	if (pcurs == CURSOR_HAND) {
-		if (!plr[myplr].InvBody[INVLOC_HAND_LEFT].isEmpty()
-		    && (plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF || plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_UNIQUE)
-		    && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iSpell == plr[myplr]._pRSpell
-		    && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
+		if (!plr[pnum].InvBody[INVLOC_HAND_LEFT].isEmpty()
+		    && (plr[pnum].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF || plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_UNIQUE)
+		    && plr[pnum].InvBody[INVLOC_HAND_LEFT]._iSpell == plr[myplr]._pRSpell
+		    && plr[pnum].InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
 			return TRUE;
 		}
 	}
@@ -2682,13 +2682,13 @@ BOOL UseStaff()
 	return FALSE;
 }
 
-void StartGoldDrop()
+void StartGoldDrop(int pnum)
 {
 	initialDropGoldIndex = pcursinvitem;
 	if (pcursinvitem <= INVITEM_INV_LAST)
-		initialDropGoldValue = plr[myplr].InvList[pcursinvitem - INVITEM_INV_FIRST]._ivalue;
+		initialDropGoldValue = plr[pnum].InvList[pcursinvitem - INVITEM_INV_FIRST]._ivalue;
 	else
-		initialDropGoldValue = plr[myplr].SpdList[pcursinvitem - INVITEM_BELT_FIRST]._ivalue;
+		initialDropGoldValue = plr[pnum].SpdList[pcursinvitem - INVITEM_BELT_FIRST]._ivalue;
 	dropGoldFlag = TRUE;
 	dropGoldValue = 0;
 	if (talkflag)
@@ -2779,7 +2779,7 @@ BOOL UseInvItem(int pnum, int cii)
 	}
 
 	if (Item->_iMiscId == IMISC_NONE && Item->_itype == ITYPE_GOLD) {
-		StartGoldDrop();
+		StartGoldDrop(pnum);
 		return TRUE;
 	}
 
