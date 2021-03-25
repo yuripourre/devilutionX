@@ -166,7 +166,7 @@ int ControllerButtonToKbCtrlKeyCode(ControllerButton button)
 
 } // namespace
 
-bool IsKbCtrlButtonPressed(ControllerButton button)
+bool IsPressed(ControllerButton button)
 {
 	int key_code = ControllerButtonToKbCtrlKeyCode(button);
 	if (key_code == -1)

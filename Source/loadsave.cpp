@@ -5,6 +5,8 @@
  */
 #include "all.h"
 
+#include <iostream>
+
 DEVILUTION_BEGIN_NAMESPACE
 
 bool gbIsHellfireSaveGame;
@@ -985,6 +987,8 @@ void LoadGame(BOOL firstflag)
 	nummissiles = _nummissiles;
 	nobjects = _nobjects;
 
+	// This is just like LoadLevel()
+
 	for (int i = 0; i < MAXMONSTERS; i++)
 		monstkills[i] = file.nextBE<Sint32>();
 
@@ -1106,6 +1110,41 @@ void LoadGame(BOOL firstflag)
 		SaveGame();
 
 	gbIsHellfireSaveGame = gbIsHellfire;
+
+	// TODO MAYBE MOVE IT TO gamemenu.cpp?
+	// TODO! Test if it works!
+	// Load player 2 stats
+	int pnum = myplr + 1;
+	std::cout << "Loading another player: " << pnum << std::endl;
+	LoadPlayer(&file, pnum);
+	PlayerStruct &player = plr[pnum];
+
+	// Borrowed from multiplayer
+	plr[pnum].plractive = TRUE;
+	player.pManaShield = true;
+
+	std::string s = "Merlin";
+	strcpy(player._pName, s.c_str());
+	player._pClass = PC_SORCERER;
+	player._pLevel = 3;
+	player._pHitPoints = 100 << 6;
+	player._pMaxHP = 110 << 6;
+	// Start player as stand
+	player._pmode = PM_STAND;
+
+	// Force graphics to load
+	player._pGFXLoad = 0;
+	LoadPlrGFX(pnum, PFILE_STAND);
+	SyncInitPlr(pnum);
+	StartStand(pnum, DIR_S);
+
+	// Define player position closer to player one
+	player._px = plr[myplr]._px;
+	player._py = plr[myplr]._py + 1;
+	dPlayer[player._px][player._py + 1] = 2;
+
+	// TODO ADD RESS EFFECT
+	//AddMissile(player._px, player._py, int dx, int dy, DIR_S, 0, 0, int id, int midam, int spllvl)
 }
 
 static void SaveItem(SaveHelper *file, ItemStruct *pItem)
@@ -1769,10 +1808,22 @@ void SaveGame()
 		for (int i = 0; i < MAXDUNX; i++)
 			file.writeLE<Sint8>(dFlags[i][j] & ~(BFLAG_MISSILE | BFLAG_VISIBLE | BFLAG_DEAD_PLAYER));
 	}
+
 	for (int j = 0; j < MAXDUNY; j++) {
-		for (int i = 0; i < MAXDUNX; i++)
-			file.writeLE<Sint8>(dPlayer[i][j]);
+		for (int i = 0; i < MAXDUNX; i++) {
+		    char value = dPlayer[i][j];
+		    if (gbIsCouchCoop) {
+		    	if (value > 0) {
+					std::cout << "Saving dPlayer[: " << i << "][" << j << "] = " << (int)value << std::endl;
+					if (value > myplr + 1) {
+						file.writeLE<Sint8>(0);
+					}
+		    	}
+		    }
+			file.writeLE<Sint8>(value);
+		}
 	}
+
 	for (int j = 0; j < MAXDUNY; j++) {
 		for (int i = 0; i < MAXDUNX; i++)
 			file.writeLE<Sint8>(dItem[i][j]);

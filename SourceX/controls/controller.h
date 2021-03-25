@@ -32,6 +32,8 @@ public:
 	// Must be called exactly once for each SDL input event.
 	ControllerButton ToControllerButton(const SDL_Event &event) const;
 
+	bool IsPressed(ControllerButton button) const;
+
 private:
 	void ScaleJoystickAxes(float *x, float *y, float deadzone);
 };

@@ -40,6 +40,7 @@ extern BYTE gbActivePlayers;
 extern BOOLEAN gbGameDestroyed;
 extern BOOLEAN gbSelectProvider;
 extern bool gbIsMultiplayer;
+extern bool gbIsCouchCoop;
 extern char szPlayerName[128];
 extern BYTE gbDeltaSender;
 extern int player_state[MAX_PLRS];

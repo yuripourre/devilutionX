@@ -21,11 +21,10 @@ public:
 
 	ControllerButton ToControllerButton(const SDL_Event &event) const;
 
-	//bool ProcessKbCtrlAxisMotion(const SDL_Event &event);
+	bool IsPressed(ControllerButton button) const;
+
 	bool ProcessAxisMotion(const SDL_Event &event);
 };
-
-bool IsKbCtrlButtonPressed(ControllerButton button);
 
 } // namespace dvl
 #endif

@@ -141,7 +141,7 @@ bool IsControllerButtonPressed(ControllerButton button)
 		return true;
 #endif
 #if HAS_KBCTRL == 1
-	if (IsKbCtrlButtonPressed(button))
+	if (IsPressed(button))
 		return true;
 #endif
 	return Joystick::IsPressedOnAnyJoystick(button);

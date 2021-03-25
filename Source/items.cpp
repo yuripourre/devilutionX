@@ -1775,9 +1775,9 @@ void GetStaffSpell(int i, int lvl, BOOL onlygood)
 				bs = static_cast<spell_id>(s);
 			}
 			s++;
-			if (!gbIsMultiplayer && s == SPL_RESURRECT)
+			if (!gbIsMultiplayer && !gbIsCouchCoop && s == SPL_RESURRECT)
 				s = SPL_TELEKINESIS;
-			if (!gbIsMultiplayer && s == SPL_HEALOTHER)
+			if (!gbIsMultiplayer && !gbIsCouchCoop && s == SPL_HEALOTHER)
 				s = SPL_FLARE;
 			if (s == maxSpells)
 				s = SPL_FIREBOLT;
@@ -2500,9 +2500,9 @@ int RndItem(int m)
 			ril[ri] = i;
 			ri++;
 		}
-		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer && !gbIsCouchCoop)
 			ri--;
-		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer && !gbIsCouchCoop)
 			ri--;
 	}
 
@@ -2541,9 +2541,9 @@ int RndUItem(int m)
 			okflag = FALSE;
 		if (AllItemsList[i].iMiscId == IMISC_BOOK)
 			okflag = TRUE;
-		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer && !gbIsCouchCoop)
 			okflag = FALSE;
-		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer && !gbIsCouchCoop)
 			okflag = FALSE;
 		if (okflag && ri < 512) {
 			ril[ri] = i;
@@ -2572,9 +2572,9 @@ int RndAllItems()
 			ril[ri] = i;
 			ri++;
 		}
-		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer && !gbIsCouchCoop)
 			ri--;
-		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer)
+		if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer && !gbIsCouchCoop)
 			ri--;
 	}
 
@@ -4760,9 +4760,9 @@ BOOL WitchItemOk(int i)
 		rv = FALSE;
 	if (AllItemsList[i].iMiscId > IMISC_OILFIRST && AllItemsList[i].iMiscId < IMISC_OILLAST)
 		rv = FALSE;
-	if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer)
+	if (AllItemsList[i].iSpell == SPL_RESURRECT && !gbIsMultiplayer && !gbIsCouchCoop)
 		rv = FALSE;
-	if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer)
+	if (AllItemsList[i].iSpell == SPL_HEALOTHER && !gbIsMultiplayer && !gbIsCouchCoop)
 		rv = FALSE;
 
 	return rv;

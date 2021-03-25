@@ -4,6 +4,7 @@
  * Implementation of functionality for rendering the dungeons, monsters and calling other render routines.
  */
 #include "all.h"
+#include <iostream>
 
 DEVILUTION_BEGIN_NAMESPACE
 
@@ -766,6 +767,9 @@ static void scrollrt_draw_dungeon(CelOutputBuffer out, int sx, int sy, int dx, i
 		DrawDeadPlayer(out, sx, sy, dx, dy);
 	}
 	if (dPlayer[sx][sy] > 0) {
+		if (dPlayer[sx][sy] > 0) {
+			//std::cout << "Drawing dPlayer[" << sx << "][" << sy << "] = " << (int)dPlayer[sx][sy] << std::endl;
+		}
 		DrawPlayerHelper(out, sx, sy, dx, dy);
 	}
 	if (dMonster[sx][sy] > 0) {
@@ -1517,28 +1521,32 @@ void DrawAndBlit()
 	lock_buf(0);
 	CelOutputBuffer out = GlobalBackBuffer();
 
-	DrawView(out, ViewX, ViewY);
-	if (ctrlPan) {
-		DrawCtrlPan(out);
-	}
-	if (drawhpflag) {
-		UpdateLifeFlask(out);
-	}
-	if (drawmanaflag) {
-		UpdateManaFlask(out);
-	}
-	if (drawbtnflag) {
-		DrawCtrlBtns(out);
-	}
-	if (drawsbarflag) {
-		DrawInvBelt(out);
-	}
-	if (talkflag) {
-		DrawTalkPan(out);
-		hgt = gnScreenHeight;
-	}
-	DrawXPBar(out);
-	scrollrt_draw_cursor_item(out);
+	//if (!gbIsCouchCoop) {
+		DrawView(out, ViewX, ViewY);
+		if (ctrlPan) {
+			DrawCtrlPan(out);
+		}
+		if (drawhpflag) {
+			UpdateLifeFlask(out);
+		}
+		if (drawmanaflag) {
+			UpdateManaFlask(out);
+		}
+		if (drawbtnflag) {
+			DrawCtrlBtns(out);
+		}
+		if (drawsbarflag) {
+			DrawInvBelt(out);
+		}
+		if (talkflag) {
+			DrawTalkPan(out);
+			hgt = gnScreenHeight;
+		}
+		DrawXPBar(out);
+		scrollrt_draw_cursor_item(out);
+	//} else {
+    //	DrawGame(out, ViewX, ViewY);
+    //}
 
 	DrawFPS(out);
 

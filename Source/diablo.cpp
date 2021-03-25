@@ -1743,7 +1743,7 @@ void LoadGameLevel(BOOL firstflag, int lvldir)
 		InitItemGFX();
 		InitQuestText();
 
-		int players = gbIsMultiplayer ? MAX_PLRS : 1;
+		int players = (gbIsMultiplayer || gbIsCouchCoop) ? MAX_PLRS : 1;
 		for (i = 0; i < players; i++)
 			InitPlrGFXMem(i);
 
@@ -1808,7 +1808,8 @@ void LoadGameLevel(BOOL firstflag, int lvldir)
 		IncProgress();
 
 		visited = FALSE;
-		int players = gbIsMultiplayer ? MAX_PLRS : 1;
+
+		int players = (gbIsMultiplayer || gbIsCouchCoop) ? MAX_PLRS : 1;
 		for (i = 0; i < players; i++) {
 			if (plr[i].plractive)
 				visited = visited || plr[i]._pLvlVisited[currlevel];

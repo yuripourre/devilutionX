@@ -33,6 +33,7 @@ DWORD sgdwGameLoops;
  * represents a single player game and 4 represents a multi player game.
  */
 bool gbIsMultiplayer;
+bool gbIsCouchCoop = true;
 BOOLEAN sgbTimeout;
 char szPlayerName[128];
 BYTE gbDeltaSender;

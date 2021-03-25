@@ -3356,7 +3356,7 @@ void AddDiabApoca(Sint32 mi, Sint32 sx, Sint32 sy, Sint32 dx, Sint32 dy, Sint32 
 {
 	int pnum;
 
-	int players = gbIsMultiplayer ? MAX_PLRS : 1;
+    int players = (gbIsMultiplayer || gbIsCouchCoop) ? MAX_PLRS : 1;
 	for (pnum = 0; pnum < players; pnum++) {
 		if (plr[pnum].plractive) {
 			if (LineClear(sx, sy, plr[pnum]._pfutx, plr[pnum]._pfuty)) {
