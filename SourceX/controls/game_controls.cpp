@@ -53,8 +53,8 @@ bool HandleStartAndSelect(const ControllerButtonEvent &ctrl_event, GameAction *a
 {
 	const bool in_game_menu = InGameMenu(myplr);
 
-	const bool start_is_down = IsControllerButtonPressed(ControllerButton_BUTTON_START);
-	const bool select_is_down = IsControllerButtonPressed(ControllerButton_BUTTON_BACK);
+	const bool start_is_down = Controller::IsControllerButtonPressed(ControllerButton_BUTTON_START);
+	const bool select_is_down = Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK);
 	start_modifier_active = !in_game_menu && start_is_down;
 	select_modifier_active = !in_game_menu && select_is_down && !start_modifier_active;
 
@@ -111,7 +111,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 		break;
 	case ControllerButton_BUTTON_RIGHTSTICK:
 		if (!IsAutomapActive()) {
-			if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+			if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 				*action = GameActionSendMouseClick { GameActionSendMouseClick::RIGHT, ctrl_event.up };
 			else
 				*action = GameActionSendMouseClick { GameActionSendMouseClick::LEFT, ctrl_event.up };
@@ -164,26 +164,26 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 		if (dpad_hotkeys) {
 			switch (ctrl_event.button) {
 			case ControllerButton_BUTTON_DPAD_UP:
-				if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+				if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 					*action = GameActionSendKey{ DVL_VK_F6, ctrl_event.up };
 				else
 					*action = GameActionSendKey{ DVL_VK_ESCAPE, ctrl_event.up };
 				return true;
 			case ControllerButton_BUTTON_DPAD_RIGHT:
-				if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+				if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 					*action = GameActionSendKey{ DVL_VK_F8, ctrl_event.up };
 				else
 					if (!ctrl_event.up)
 						*action = GameAction(GameActionType_TOGGLE_INVENTORY);
 				return true;
 			case ControllerButton_BUTTON_DPAD_DOWN:
-				if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+				if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 					*action = GameActionSendKey{ DVL_VK_F7, ctrl_event.up };
 				else
 					*action = GameActionSendKey{ DVL_VK_TAB, ctrl_event.up };
 				return true;
 			case ControllerButton_BUTTON_DPAD_LEFT:
-				if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+				if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 					*action = GameActionSendKey{ DVL_VK_F5, ctrl_event.up };
 				else
 					if (!ctrl_event.up)
@@ -246,7 +246,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 		// Bottom button: Closes menus or opens quick spell book if nothing is open.
 		if (ctrl_event.button == ControllerButton_BUTTON_A) { // Bottom button
 			if (ctrl_event.up) return true;
-			if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+			if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 				*action = GameActionSendKey { DVL_VK_F7, ctrl_event.up };
 			else if (invflag)
 				*action = GameAction(GameActionType_TOGGLE_INVENTORY);
@@ -267,7 +267,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 				return true;
 			case ControllerButton_BUTTON_B: // Right button
 				if (!ctrl_event.up) {
-					if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+					if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 						*action = GameActionSendKey{ DVL_VK_F8, ctrl_event.up };
 					else
 						*action = GameAction(GameActionType_PRIMARY_ACTION);
@@ -275,7 +275,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 				return true;
 			case ControllerButton_BUTTON_Y: // Top button
 				if (!ctrl_event.up) {
-					if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+					if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 						*action = GameActionSendKey{ DVL_VK_F6, ctrl_event.up };
 					else
 						*action = GameAction(GameActionType_SECONDARY_ACTION);
@@ -283,7 +283,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 				return true;
 			case ControllerButton_BUTTON_X: // Left button
 				if (!ctrl_event.up) {
-					if (IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+					if (Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 						*action = GameActionSendKey{ DVL_VK_F5, ctrl_event.up };
 					else
 						*action = GameAction(GameActionType_CAST_SPELL);
@@ -338,7 +338,7 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 #ifndef USE_SDL1
 	// Ignore unhandled joystick events where a GameController is open for this joystick.
 	// This is because SDL sends both game controller and joystick events in this case.
-	const Joystick *const joystick = Joystick::Get(event);
+	Controller *const joystick = Joystick::Get(event);
 	if (joystick != NULL && GameController::Get(joystick->instance_id()) != NULL) {
 		return true;
 	}

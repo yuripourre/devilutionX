@@ -16,6 +16,7 @@ class KeyboardController : public Controller {
 	static std::vector<KeyboardController> *const keyboardControllers_;
 
 public:
+	KeyboardController() { type_ = CONTROLLER_KEYBOARD; };
 	static void Add(int device_index);
 	static KeyboardController *Get(const SDL_Event &event);
 

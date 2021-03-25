@@ -27,7 +27,7 @@ bool SimulateRightStickWithDpad(const SDL_Event &event, ControllerButtonEvent ct
 		}
 		return false;
 	}
-	if (!IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+	if (!Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 		return false;
 	switch (ctrl_event.button) {
 	case ControllerButton_BUTTON_DPAD_LEFT:
@@ -56,19 +56,19 @@ bool SimulateRightStickWithDpad(const SDL_Event &event, ControllerButtonEvent ct
 bool ProcessControllerMotion(const SDL_Event &event, ControllerButtonEvent ctrl_event)
 {
 #ifndef USE_SDL1
-	GameController *const controller = GameController::Get(event);
+	Controller *const controller = GameController::Get(event);
 	if (controller != NULL && controller->ProcessAxisMotion(event)) {
 		controller->ScaleJoysticks();
 		return true;
 	}
 #endif
-	Joystick *const joystick = Joystick::Get(event);
+	Controller *const joystick = Joystick::Get(event);
 	if (joystick != NULL && joystick->ProcessAxisMotion(event)) {
 		joystick->ScaleJoysticks();
 		return true;
 	}
 #if HAS_KBCTRL == 1
-	KeyboardController *const keyboardController = KeyboardController::Get(event);
+	Controller *const keyboardController = KeyboardController::Get(event);
 	if (keyboardController != NULL && keyboardController->ProcessAxisMotion(event)) {
 		keyboardController->ScaleJoysticks();
 		return true;

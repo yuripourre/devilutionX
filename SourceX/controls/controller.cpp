@@ -6,6 +6,28 @@
 
 namespace dvl {
 
+std::vector<Controller> *const Controller::controllers_ = new std::vector<Controller>;
+
+Controller *Controller::GetFromEvent(const SDL_Event &event) {
+#ifndef USE_SDL1
+	Controller *const controller = GameController::Get(event);
+	if (controller != NULL) {
+		return controller;
+	}
+#endif
+	Controller *const joystick = Joystick::Get(event);
+	if (joystick != NULL) {
+    	return joystick;
+    }
+#if HAS_KBCTRL == 1
+	Controller *const keyboardController = KeyboardController::Get(event);
+	if (keyboardController != NULL) {
+		return keyboardController;
+	}
+#endif
+	return NULL;
+}
+
 AxisDirection Controller::GetLeftStickOrDpadDirection(bool allow_dpad)
 {
 	const float stickX = leftStickX;
@@ -13,15 +35,15 @@ AxisDirection Controller::GetLeftStickOrDpadDirection(bool allow_dpad)
 
 	AxisDirection result { AxisDirectionX_NONE, AxisDirectionY_NONE };
 
-	if (stickY >= 0.5 || (allow_dpad && IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_UP))) {
+	if (stickY >= 0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_UP))) {
 		result.y = AxisDirectionY_UP;
-	} else if (stickY <= -0.5 || (allow_dpad && IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_DOWN))) {
+	} else if (stickY <= -0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_DOWN))) {
 		result.y = AxisDirectionY_DOWN;
 	}
 
-	if (stickX <= -0.5 || (allow_dpad && IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_LEFT))) {
+	if (stickX <= -0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_LEFT))) {
 		result.x = AxisDirectionX_LEFT;
-	} else if (stickX >= 0.5 || (allow_dpad && IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_RIGHT))) {
+	} else if (stickX >= 0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_RIGHT))) {
 		result.x = AxisDirectionX_RIGHT;
 	}
 
@@ -94,7 +116,7 @@ void Controller::ScaleJoystickAxes(float *x, float *y, float deadzone)
 	}
 }
 
-ControllerButtonEvent ToControllerButtonEvent(const SDL_Event &event)
+ControllerButtonEvent Controller::ToControllerButtonEvent(const SDL_Event &event)
 {
 	ControllerButtonEvent result { ControllerButton_NONE, false };
 	switch (event.type) {
@@ -109,42 +131,31 @@ ControllerButtonEvent ToControllerButtonEvent(const SDL_Event &event)
 		break;
 	}
 
-#if HAS_KBCTRL == 1
-	KeyboardController *const keyboardController = KeyboardController::Get(event);
-	if (keyboardController != NULL) {
-		result.button = keyboardController->ToControllerButton(event);
-		if (result.button != ControllerButton_NONE)
-			return result;
-	}
-#endif
-
-#ifndef USE_SDL1
-	GameController *const controller = GameController::Get(event);
+	Controller *const controller = Controller::GetFromEvent(event);
 	if (controller != NULL) {
 		result.button = controller->ToControllerButton(event);
 		if (result.button != ControllerButton_NONE)
 			return result;
 	}
-#endif
-
-	const Joystick *const joystick = Joystick::Get(event);
-	if (joystick != NULL)
-		result.button = joystick->ToControllerButton(event);
-
 	return result;
 }
 
-bool IsControllerButtonPressed(ControllerButton button)
+bool Controller::IsPressed(ControllerButton button) const
 {
-#ifndef USE_SDL1
-	if (GameController::IsPressedOnAnyController(button))
-		return true;
-#endif
-#if HAS_KBCTRL == 1
-	if (IsPressed(button))
-		return true;
-#endif
-	return Joystick::IsPressedOnAnyJoystick(button);
+	return false;
+}
+
+bool Controller::ProcessAxisMotion(const SDL_Event &event)
+{
+	return false;
+}
+
+bool Controller::IsControllerButtonPressed(ControllerButton button)
+{
+	for (std::size_t i = 0; i < controllers_->size(); ++i)
+		if ((*controllers_)[i].IsPressed(button))
+			return true;
+	return false;
 }
 
 bool HandleControllerAddedOrRemovedEvent(const SDL_Event &event)
@@ -170,6 +181,16 @@ bool HandleControllerAddedOrRemovedEvent(const SDL_Event &event)
 #else
 	return false;
 #endif
+}
+
+ControllerButton Controller::ToControllerButton(const SDL_Event &event) const
+{
+	return ControllerButton_IGNORE;
+}
+
+const std::vector<Controller> &Controller::All()
+{
+	return *controllers_;
 }
 
 } // namespace dvl

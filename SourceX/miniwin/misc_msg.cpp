@@ -347,7 +347,7 @@ bool FetchMessage(LPMSG lpMsg)
 	if (HandleControllerAddedOrRemovedEvent(e))
 		return true;
 
-	const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(e);
+	const ControllerButtonEvent ctrl_event = Controller::ToControllerButtonEvent(e);
 	if (ProcessControllerMotion(e, ctrl_event))
 		return true;
 

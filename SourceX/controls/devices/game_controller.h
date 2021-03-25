@@ -12,15 +12,13 @@
 namespace dvl {
 
 class GameController : public Controller {
-	static std::vector<GameController> *const controllers_;
 
 public:
+	GameController() { type_ = CONTROLLER_GAME_CONTROLLER; };
 	static void Add(int joystick_index);
 	static void Remove(SDL_JoystickID instance_id);
-	static GameController *Get(SDL_JoystickID instance_id);
-	static GameController *Get(const SDL_Event &event);
-	static const std::vector<GameController> &All();
-	static bool IsPressedOnAnyController(ControllerButton button);
+	static Controller *Get(SDL_JoystickID instance_id);
+	static Controller *Get(const SDL_Event &event);
 
 	// NOTE: Not idempotent.
 	// Must be called exactly once for each SDL input event.
@@ -33,7 +31,6 @@ private:
 	SDL_GameControllerButton ToSdlGameControllerButton(ControllerButton button) const;
 
 	SDL_GameController *sdl_game_controller_ = NULL;
-	SDL_JoystickID instance_id_ = -1;
 
 	bool trigger_left_is_down_ = false;
 	bool trigger_right_is_down_ = false;

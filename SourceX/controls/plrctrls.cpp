@@ -875,8 +875,8 @@ void ProcessLeftStickOrDPadGameUI() {
 void Movement()
 {
 	if (InGameMenu(myplr)
-	    || IsControllerButtonPressed(ControllerButton_BUTTON_START)
-	    || IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
+	    || Controller::IsControllerButtonPressed(ControllerButton_BUTTON_START)
+	    || Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 		return;
 
 	AxisDirection move_dir = GetMoveDirection();

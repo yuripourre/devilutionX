@@ -11,8 +11,6 @@ extern "C" bool sgbControllerActive;
 
 namespace dvl {
 
-std::vector<Joystick> *const Joystick::joysticks_ = new std::vector<Joystick>;
-
 ControllerButton Joystick::ToControllerButton(const SDL_Event &event) const
 {
 	switch (event.type) {
@@ -263,7 +261,7 @@ void Joystick::Add(int device_index)
 #ifndef USE_SDL1
 	result.instance_id_ = SDL_JoystickInstanceID(result.sdl_joystick_);
 #endif
-	joysticks_->push_back(result);
+	controllers_->push_back(result);
 	sgbControllerActive = true;
 }
 
@@ -271,34 +269,29 @@ void Joystick::Remove(SDL_JoystickID instance_id)
 {
 #ifndef USE_SDL1
 	SDL_Log("Removing joystick (instance id: %d)", instance_id);
-	for (std::size_t i = 0; i < joysticks_->size(); ++i) {
-		const Joystick &joystick = (*joysticks_)[i];
-		if (joystick.instance_id_ != instance_id)
+	for (std::size_t i = 0; i < controllers_->size(); ++i) {
+		const Controller &joystick = (*controllers_)[i];
+		if (joystick.instance_id() != instance_id || CONTROLLER_JOYSTICK != joystick.type())
 			continue;
-		joysticks_->erase(joysticks_->begin() + i);
-		sgbControllerActive = !joysticks_->empty();
+		controllers_->erase(controllers_->begin() + i);
+		sgbControllerActive = !controllers_->empty();
 		return;
 	}
 	SDL_Log("Joystick not found with instance id: %d", instance_id);
 #endif
 }
 
-const std::vector<Joystick> &Joystick::All()
+Controller *Joystick::Get(SDL_JoystickID instance_id)
 {
-	return *joysticks_;
-}
-
-Joystick *Joystick::Get(SDL_JoystickID instance_id)
-{
-	for (std::size_t i = 0; i < joysticks_->size(); ++i) {
-		Joystick &joystick = (*joysticks_)[i];
-		if (joystick.instance_id_ == instance_id)
+	for (std::size_t i = 0; i < controllers_->size(); ++i) {
+		Controller &joystick = (*controllers_)[i];
+		if (joystick.instance_id() == instance_id && CONTROLLER_JOYSTICK == joystick.type())
 			return &joystick;
 	}
 	return NULL;
 }
 
-Joystick *Joystick::Get(const SDL_Event &event)
+Controller *Joystick::Get(const SDL_Event &event)
 {
 	switch (event.type) {
 #ifndef USE_SDL1
@@ -325,14 +318,6 @@ Joystick *Joystick::Get(const SDL_Event &event)
 			return NULL;
 #endif
 	}
-}
-
-bool Joystick::IsPressedOnAnyJoystick(ControllerButton button)
-{
-	for (std::size_t i = 0; i < joysticks_->size(); ++i)
-		if ((*joysticks_)[i].IsPressed(button))
-			return true;
-	return false;
 }
 
 } // namespace dvl

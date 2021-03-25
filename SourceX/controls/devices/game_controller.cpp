@@ -13,8 +13,6 @@ extern "C" bool sgbControllerActive;
 
 namespace dvl {
 
-std::vector<GameController> *const GameController::controllers_ = new std::vector<GameController>;
-
 ControllerButton GameController::ToControllerButton(const SDL_Event &event)
 {
 	switch (event.type) {
@@ -173,8 +171,8 @@ void GameController::Remove(SDL_JoystickID instance_id)
 {
 	SDL_Log("Removing game controller with instance id %d", instance_id);
 	for (std::size_t i = 0; i < controllers_->size(); ++i) {
-		const GameController &controller = (*controllers_)[i];
-		if (controller.instance_id_ != instance_id)
+		const Controller &controller = (*controllers_)[i];
+		if (controller.instance_id() != instance_id || CONTROLLER_GAME_CONTROLLER != controller.type())
 			continue;
 		controllers_->erase(controllers_->begin() + i);
 		sgbControllerActive = !controllers_->empty();
@@ -183,17 +181,17 @@ void GameController::Remove(SDL_JoystickID instance_id)
 	SDL_Log("Game controller not found with instance id: %d", instance_id);
 }
 
-GameController *GameController::Get(SDL_JoystickID instance_id)
+Controller *GameController::Get(SDL_JoystickID instance_id)
 {
 	for (std::size_t i = 0; i < controllers_->size(); ++i) {
-		GameController &controller = (*controllers_)[i];
-		if (controller.instance_id_ == instance_id)
+		Controller &controller = (*controllers_)[i];
+		if (controller.instance_id() == instance_id && CONTROLLER_GAME_CONTROLLER == controller.type())
 			return &controller;
 	}
 	return NULL;
 }
 
-GameController *GameController::Get(const SDL_Event &event)
+Controller *GameController::Get(const SDL_Event &event)
 {
 	switch (event.type) {
 		case SDL_CONTROLLERAXISMOTION:
@@ -204,19 +202,6 @@ GameController *GameController::Get(const SDL_Event &event)
 		default:
 			return NULL;
 	}
-}
-
-const std::vector<GameController> &GameController::All()
-{
-	return *controllers_;
-}
-
-bool GameController::IsPressedOnAnyController(ControllerButton button)
-{
-	for (std::size_t i = 0; i < controllers_->size(); ++i)
-		if ((*controllers_)[i].IsPressed(button))
-			return true;
-	return false;
 }
 
 } // namespace dvl

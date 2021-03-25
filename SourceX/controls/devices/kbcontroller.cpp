@@ -10,10 +10,15 @@ namespace dvl {
 
 std::vector<KeyboardController> *const KeyboardController::keyboardControllers_ = new std::vector<KeyboardController>;
 
-KeyboardController *KeyboardController::Get(const SDL_Event &event) {
-	// Return the first (and only) one
-	KeyboardController &keyboardController = (*keyboardControllers_)[0];
-	return &keyboardController;
+Controller *KeyboardController::Get(const SDL_Event &event)
+{
+	for (std::size_t i = 0; i < controllers_->size(); ++i) {
+		Controller &keyboardController = (*controllers_)[i];
+		// Return the first (and only) one
+		if (CONTROLLER_KEYBOARD == joystick.type())
+			return &keyboardController;
+	}
+	return NULL;
 }
 
 bool KeyboardController::ProcessAxisMotion(const SDL_Event &event)

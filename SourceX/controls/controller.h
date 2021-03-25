@@ -13,8 +13,17 @@ struct ControllerButtonEvent {
 	bool up;
 };
 
+enum controller_type {
+	CONTROLLER_UNKNOWN,
+	CONTROLLER_GAME_CONTROLLER,
+	CONTROLLER_JOYSTICK,
+	CONTROLLER_KEYBOARD,
+};
+
 class Controller {
+
 public:
+	Controller() { type_ = CONTROLLER_UNKNOWN; };
 	// Raw axis values.
 	float leftStickX, leftStickY, rightStickX, rightStickY;
 	// Axis values scaled to [-1, 1] range and clamped to a deadzone.
@@ -34,15 +43,36 @@ public:
 
 	bool IsPressed(ControllerButton button) const;
 
+	static Controller *GetFromEvent(const SDL_Event &event);
+
+	SDL_JoystickID instance_id() const
+	{
+		return instance_id_;
+	}
+
+	controller_type type() const
+	{
+		return type_;
+	}
+
+	bool ProcessAxisMotion(const SDL_Event &event);
+
+	static const std::vector<Controller> &All();
+
+	static bool IsControllerButtonPressed(ControllerButton button);
+
+	// NOTE: Not idempotent because of how it handles axis triggers.
+    // Must be called exactly once per SDL input event.
+    static ControllerButtonEvent ToControllerButtonEvent(const SDL_Event &event);
+
+protected:
+	static std::vector<Controller> *const controllers_;
+	controller_type type_ = CONTROLLER_UNKNOWN;
+	SDL_JoystickID instance_id_ = -1;
+
 private:
 	void ScaleJoystickAxes(float *x, float *y, float deadzone);
 };
-
-// NOTE: Not idempotent because of how it handles axis triggers.
-// Must be called exactly once per SDL input event.
-ControllerButtonEvent ToControllerButtonEvent(const SDL_Event &event);
-
-bool IsControllerButtonPressed(ControllerButton button);
 
 bool HandleControllerAddedOrRemovedEvent(const SDL_Event &event);
 

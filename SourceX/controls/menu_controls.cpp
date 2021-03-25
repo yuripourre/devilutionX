@@ -24,7 +24,7 @@ MenuAction GetMenuHeldUpDownAction()
 
 MenuAction GetMenuAction(const SDL_Event &event)
 {
-	const ControllerButtonEvent ctrl_event = ToControllerButtonEvent(event);
+	const ControllerButtonEvent ctrl_event = Controller::ToControllerButtonEvent(event);
 
 	if (ProcessControllerMotion(event, ctrl_event)) {
 		sgbControllerActive = true;
