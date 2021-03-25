@@ -71,8 +71,6 @@ struct GameAction {
 
 bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, GameAction *action);
 
-AxisDirection GetMoveDirection();
-
 extern bool start_modifier_active;
 extern bool select_modifier_active;
 extern bool dpad_hotkeys;

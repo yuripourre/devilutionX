@@ -8,14 +8,19 @@
 
 namespace dvl {
 
-std::vector<KeyboardController> *const KeyboardController::keyboardControllers_ = new std::vector<KeyboardController>;
+void KeyboardController::Add(int device_index)
+{
+	SDL_Log("Adding KeyboardController %d", device_index);
+	controllers_->push_back(KeyboardController());
+	sgbControllerActive = true;
+}
 
 Controller *KeyboardController::Get(const SDL_Event &event)
 {
 	for (std::size_t i = 0; i < controllers_->size(); ++i) {
 		Controller &keyboardController = (*controllers_)[i];
 		// Return the first (and only) one
-		if (CONTROLLER_KEYBOARD == joystick.type())
+		if (CONTROLLER_KEYBOARD == keyboardController.type())
 			return &keyboardController;
 	}
 	return NULL;

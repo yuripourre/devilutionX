@@ -350,9 +350,4 @@ bool GetGameAction(const SDL_Event &event, ControllerButtonEvent ctrl_event, Gam
 	return false;
 }
 
-AxisDirection GetMoveDirection()
-{
-	return controller.GetLeftStickOrDpadDirection(/*allow_dpad=*/!dpad_hotkeys);
-}
-
 } // namespace dvl

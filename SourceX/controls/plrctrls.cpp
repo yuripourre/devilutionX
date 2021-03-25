@@ -869,7 +869,7 @@ HandleLeftStickOrDPadFn GetLeftStickOrDPadGameUIHandler()
 void ProcessLeftStickOrDPadGameUI() {
 	HandleLeftStickOrDPadFn handler = GetLeftStickOrDPadGameUIHandler();
 	if (handler != NULL)
-		handler(controller.GetLeftStickOrDpadDirection(true));
+		handler(Controller::GetLeftStickOrDpadDirection(true));
 }
 
 void Movement()
@@ -879,7 +879,7 @@ void Movement()
 	    || Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 		return;
 
-	AxisDirection move_dir = GetMoveDirection();
+	AxisDirection move_dir = Controller::GetMoveDirection();
 	if (move_dir.x != AxisDirectionX_NONE || move_dir.y != AxisDirectionY_NONE) {
 		sgbControllerActive = true;
 	}
@@ -900,6 +900,10 @@ struct RightStickAccumulator {
 
 	void pool(int *x, int *y, int slowdown)
 	{
+		if (Controller::Empty())
+        	return;
+		Controller controller = Controller::GetFirst();
+
 		const Uint32 tc = SDL_GetTicks();
 		const int dtc = tc - lastTc;
 		hiresDX += controller.rightStickX * dtc;
@@ -981,11 +985,17 @@ bool IsAutomapActive()
 
 bool IsMovingMouseCursorWithController()
 {
+	if (Controller::Empty())
+		return false;
+	Controller controller = Controller::GetFirst();
 	return controller.rightStickX != 0 || controller.rightStickY != 0;
 }
 
 void HandleRightStickMotion()
 {
+	if (Controller::Empty())
+		return;
+	Controller controller = Controller::GetFirst();
 	static RightStickAccumulator acc;
 	// deadzone is handled in ScaleJoystickAxes() already
 	if (controller.rightStickX == 0 && controller.rightStickY == 0) {

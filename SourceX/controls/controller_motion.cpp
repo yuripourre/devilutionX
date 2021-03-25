@@ -10,13 +10,15 @@
 
 namespace dvl {
 
-Controller controller;
-
 namespace {
 
 // SELECT + D-Pad to simulate right stick movement.
 bool SimulateRightStickWithDpad(const SDL_Event &event, ControllerButtonEvent ctrl_event)
 {
+	if (Controller::Empty())
+		return false;
+
+	Controller controller = Controller::GetFirst();
 	if (dpad_hotkeys)
 		return false;
 	static bool simulating = false;

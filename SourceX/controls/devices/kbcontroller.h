@@ -18,7 +18,7 @@ class KeyboardController : public Controller {
 public:
 	KeyboardController() { type_ = CONTROLLER_KEYBOARD; };
 	static void Add(int device_index);
-	static KeyboardController *Get(const SDL_Event &event);
+	static Controller *Get(const SDL_Event &event);
 
 	ControllerButton ToControllerButton(const SDL_Event &event) const;
 
