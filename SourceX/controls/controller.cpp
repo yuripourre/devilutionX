@@ -8,22 +8,39 @@
 
 namespace dvl {
 
+float Controller::leftStickX = 0;
+float Controller::leftStickY = 0;
+float Controller::rightStickX = 0;
+float Controller::rightStickY = 0;
+float Controller::leftStickXUnscaled = 0;
+float Controller::leftStickYUnscaled = 0;
+float Controller::rightStickXUnscaled = 0;
+float Controller::rightStickYUnscaled = 0;
+bool Controller::leftStickNeedsScaling = false;
+bool Controller::rightStickNeedsScaling = false;
+
 std::vector<Controller> *const Controller::controllers_ = new std::vector<Controller>;
 
 Controller *Controller::GetFromEvent(const SDL_Event &event) {
 #ifndef USE_SDL1
+	SDL_Log("Trying to call Controller::Get");
 	Controller *const controller = GameController::Get(event);
 	if (controller != NULL) {
+		SDL_Log("Returns a GameController");
 		return controller;
 	}
 #endif
+	SDL_Log("Trying to call Joystick::Get");
 	Controller *const joystick = Joystick::Get(event);
 	if (joystick != NULL) {
+		SDL_Log("Returns a Joystick");
     	return joystick;
     }
 #if HAS_KBCTRL == 1
+	SDL_Log("Trying to call KeyboardController::Get");
 	Controller *const keyboardController = KeyboardController::Get(event);
 	if (keyboardController != NULL) {
+		SDL_Log("Returns a KBController");
 		return keyboardController;
 	}
 #endif
@@ -32,26 +49,22 @@ Controller *Controller::GetFromEvent(const SDL_Event &event) {
 
 AxisDirection Controller::GetLeftStickOrDpadDirection(bool allow_dpad)
 {
+	SDL_Log("Controller::GetLeftStickOrDpadDirection");
 	AxisDirection result { AxisDirectionX_NONE, AxisDirectionY_NONE };
-	if (Controller::Empty())
-    	return result;
 
-	SDL_Log("GetLeftStickOrDpadDirection");
-	Controller controller = Controller::GetFirst();
+	SDL_Log("leftStickX: %f, leftStickY: %f", Controller::leftStickX, Controller::leftStickY);
+	const float stickX = Controller::leftStickX;
+	const float stickY = Controller::leftStickY;
 
-	SDL_Log("leftStickX: %f, leftStickY: %f", controller.leftStickX, controller.leftStickY);
-	const float stickX = controller.leftStickX;
-	const float stickY = controller.leftStickY;
-
-	if (stickY >= 0.5 || (allow_dpad && controller.IsPressed(ControllerButton_BUTTON_DPAD_UP))) {
+	if (stickY >= 0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_UP))) {
 		result.y = AxisDirectionY_UP;
-	} else if (stickY <= -0.5 || (allow_dpad && controller.IsPressed(ControllerButton_BUTTON_DPAD_DOWN))) {
+	} else if (stickY <= -0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_DOWN))) {
 		result.y = AxisDirectionY_DOWN;
 	}
 
-	if (stickX <= -0.5 || (allow_dpad && controller.IsPressed(ControllerButton_BUTTON_DPAD_LEFT))) {
+	if (stickX <= -0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_LEFT))) {
 		result.x = AxisDirectionX_LEFT;
-	} else if (stickX >= 0.5 || (allow_dpad && controller.IsPressed(ControllerButton_BUTTON_DPAD_RIGHT))) {
+	} else if (stickX >= 0.5 || (allow_dpad && Controller::IsControllerButtonPressed(ControllerButton_BUTTON_DPAD_RIGHT))) {
 		result.x = AxisDirectionX_RIGHT;
 	}
 
@@ -214,11 +227,15 @@ const Controller Controller::GetFirst()
 
 AxisDirection Controller::GetMoveDirection()
 {
+	SDL_Log("Controller::GetMoveDirection");
 	if (Controller::Empty()) {
+		SDL_Log("Controller::GetMoveDirection EMPTY");
 		AxisDirection result { AxisDirectionX_NONE, AxisDirectionY_NONE };
 		return result;
 	}
-	return Controller::GetFirst().GetLeftStickOrDpadDirection(/*allow_dpad=*/!dpad_hotkeys);
+
+	SDL_Log("Before Controller::GetLeftStickOrDpadDirection");
+	return Controller::GetLeftStickOrDpadDirection(/*allow_dpad=*/!dpad_hotkeys);
 }
 
 } // namespace dvl

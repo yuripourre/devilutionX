@@ -124,24 +124,25 @@ bool GameController::IsPressed(ControllerButton button) const
 
 bool GameController::ProcessAxisMotion(const SDL_Event &event)
 {
+	SDL_Log("GameController::ProcessAxisMotion");
 	if (event.type != SDL_CONTROLLERAXISMOTION)
 		return false;
 	switch (event.caxis.axis) {
 	case SDL_CONTROLLER_AXIS_LEFTX:
-		leftStickXUnscaled = event.caxis.value;
-		leftStickNeedsScaling = true;
+		Controller::leftStickXUnscaled = event.caxis.value;
+		Controller::leftStickNeedsScaling = true;
 		break;
 	case SDL_CONTROLLER_AXIS_LEFTY:
-		leftStickYUnscaled = -event.caxis.value;
-		leftStickNeedsScaling = true;
+		Controller::leftStickYUnscaled = -event.caxis.value;
+		Controller::leftStickNeedsScaling = true;
 		break;
 	case SDL_CONTROLLER_AXIS_RIGHTX:
-		rightStickXUnscaled = event.caxis.value;
-		rightStickNeedsScaling = true;
+		Controller::rightStickXUnscaled = event.caxis.value;
+		Controller::rightStickNeedsScaling = true;
 		break;
 	case SDL_CONTROLLER_AXIS_RIGHTY:
-		rightStickYUnscaled = -event.caxis.value;
-		rightStickNeedsScaling = true;
+		Controller::rightStickYUnscaled = -event.caxis.value;
+		Controller::rightStickNeedsScaling = true;
 		break;
 	default:
 		return false;

@@ -217,26 +217,26 @@ bool Joystick::ProcessAxisMotion(const SDL_Event &event)
 	switch (event.jaxis.axis) {
 #ifdef JOY_AXIS_LEFTX
 	case JOY_AXIS_LEFTX:
-		leftStickXUnscaled = event.jaxis.value;
-		leftStickNeedsScaling = true;
+		Controller::leftStickXUnscaled = event.jaxis.value;
+		Controller::leftStickNeedsScaling = true;
 		break;
 #endif
 #ifdef JOY_AXIS_LEFTY
 	case JOY_AXIS_LEFTY:
-		leftStickYUnscaled = -event.jaxis.value;
-		leftStickNeedsScaling = true;
+		Controller::leftStickYUnscaled = -event.jaxis.value;
+		Controller::leftStickNeedsScaling = true;
 		break;
 #endif
 #ifdef JOY_AXIS_RIGHTX
 	case JOY_AXIS_RIGHTX:
-		rightStickXUnscaled = event.jaxis.value;
-		rightStickNeedsScaling = true;
+		Controller::rightStickXUnscaled = event.jaxis.value;
+		Controller::rightStickNeedsScaling = true;
 		break;
 #endif
 #ifdef JOY_AXIS_RIGHTY
 	case JOY_AXIS_RIGHTY:
-		rightStickYUnscaled = -event.jaxis.value;
-		rightStickNeedsScaling = true;
+		Controller::rightStickYUnscaled = -event.jaxis.value;
+		Controller::rightStickNeedsScaling = true;
 		break;
 #endif
 	default:
@@ -285,8 +285,11 @@ Controller *Joystick::Get(SDL_JoystickID instance_id)
 {
 	for (std::size_t i = 0; i < controllers_->size(); ++i) {
 		Controller &joystick = (*controllers_)[i];
-		if (joystick.instance_id() == instance_id && CONTROLLER_JOYSTICK == joystick.type())
+		SDL_Log("Joystick found? %ld", i);
+		if (joystick.instance_id() == instance_id && CONTROLLER_JOYSTICK == joystick.type()) {
+			SDL_Log("Joystick found!! %ld", i);
 			return &joystick;
+		}
 	}
 	return NULL;
 }

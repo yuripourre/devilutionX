@@ -12,6 +12,7 @@ MenuAction GetMenuHeldUpDownAction()
 {
 	static AxisDirectionRepeater repeater;
 	const AxisDirection dir = repeater.Get(Controller::GetMoveDirection());
+	SDL_Log("GetMenuHeldUpDownAction::AxisDirection");
 	switch (dir.y) {
 	case AxisDirectionY_UP:
 		return MenuAction_UP;
@@ -24,10 +25,13 @@ MenuAction GetMenuHeldUpDownAction()
 
 MenuAction GetMenuAction(const SDL_Event &event)
 {
+	SDL_Log("GetMenuAction");
 	const ControllerButtonEvent ctrl_event = Controller::ToControllerButtonEvent(event);
 
+	SDL_Log("GetMenuAction after ctrl_event");
 	if (ProcessControllerMotion(event, ctrl_event)) {
 		sgbControllerActive = true;
+		SDL_Log("before GetMenuHeldUpDownAction");
 		return GetMenuHeldUpDownAction();
 	}
 

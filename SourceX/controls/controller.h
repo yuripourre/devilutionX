@@ -25,18 +25,18 @@ class Controller {
 public:
 	Controller() { type_ = CONTROLLER_UNKNOWN; };
 	// Raw axis values.
-	float leftStickX = 0;
-	float leftStickY = 0;
-	float rightStickX = 0;
-	float rightStickY = 0;
+	static float leftStickX;
+	static float leftStickY;
+	static float rightStickX;
+	static float rightStickY;
 	// Axis values scaled to [-1, 1] range and clamped to a deadzone.
-	float leftStickXUnscaled = 0;
-	float leftStickYUnscaled = 0;
-	float rightStickXUnscaled = 0;
-	float rightStickYUnscaled = 0;
+	static float leftStickXUnscaled;
+	static float leftStickYUnscaled;
+	static float rightStickXUnscaled;
+	static float rightStickYUnscaled;
 	// Whether stick positions have been updated and need rescaling.
-	bool leftStickNeedsScaling = false;
-	bool rightStickNeedsScaling = false;
+	static bool leftStickNeedsScaling;
+	static bool rightStickNeedsScaling;
 
 	// Returns direction of the left thumb stick or DPad (if allow_dpad = true).
 	static AxisDirection GetLeftStickOrDpadDirection(bool allow_dpad = true);

@@ -10,21 +10,15 @@
 
 namespace dvl {
 
-namespace {
-
 // SELECT + D-Pad to simulate right stick movement.
 bool SimulateRightStickWithDpad(const SDL_Event &event, ControllerButtonEvent ctrl_event)
 {
-	if (Controller::Empty())
-		return false;
-
-	Controller controller = Controller::GetFirst();
 	if (dpad_hotkeys)
 		return false;
 	static bool simulating = false;
 	if (ctrl_event.button == ControllerButton_BUTTON_BACK) {
 		if (ctrl_event.up && simulating) {
-			controller.rightStickX = controller.rightStickY = 0;
+			Controller::rightStickX = Controller::rightStickY = 0;
 			simulating = false;
 		}
 		return false;
@@ -33,49 +27,46 @@ bool SimulateRightStickWithDpad(const SDL_Event &event, ControllerButtonEvent ct
 		return false;
 	switch (ctrl_event.button) {
 	case ControllerButton_BUTTON_DPAD_LEFT:
-		controller.rightStickX = ctrl_event.up ? 0 : -1;
+		Controller::rightStickX = ctrl_event.up ? 0 : -1;
 		break;
 	case ControllerButton_BUTTON_DPAD_RIGHT:
-		controller.rightStickX = ctrl_event.up ? 0 : 1;
+		Controller::rightStickX = ctrl_event.up ? 0 : 1;
 		break;
 	case ControllerButton_BUTTON_DPAD_UP:
-		controller.rightStickY = ctrl_event.up ? 0 : 1;
+		Controller::rightStickY = ctrl_event.up ? 0 : 1;
 		break;
 	case ControllerButton_BUTTON_DPAD_DOWN:
-		controller.rightStickY = ctrl_event.up ? 0 : -1;
+		Controller::rightStickY = ctrl_event.up ? 0 : -1;
 		break;
 	default:
 		return false;
 	}
-	simulating = !(controller.rightStickX == 0 && controller.rightStickY == 0);
+	simulating = !(Controller::rightStickX == 0 && Controller::rightStickY == 0);
 
 	return true;
 }
 
-} // namespace
-
 // Updates motion state for mouse and joystick sticks.
 bool ProcessControllerMotion(const SDL_Event &event, ControllerButtonEvent ctrl_event)
 {
-#ifndef USE_SDL1
-	Controller *const controller = GameController::Get(event);
+	SDL_Log("ProcessControllerMotion");
+	if (Controller::Empty())
+		return false;
+
+	SDL_Log("Trying to call Controller::GetFromEvent");
+	Controller *const controller = Controller::GetFromEvent(event);
+	if (controller != NULL) {
+		SDL_Log("ProcessControllerMotion::Found controller: %d",controller);
+	}
+	SDL_Log("ProcessControllerMotion::NULL");
 	if (controller != NULL && controller->ProcessAxisMotion(event)) {
+		SDL_Log("ProcessControllerMotion::ScaleJoystics?");
 		controller->ScaleJoysticks();
 		return true;
 	}
-#endif
-	Controller *const joystick = Joystick::Get(event);
-	if (joystick != NULL && joystick->ProcessAxisMotion(event)) {
-		joystick->ScaleJoysticks();
-		return true;
-	}
-#if HAS_KBCTRL == 1
-	Controller *const keyboardController = KeyboardController::Get(event);
-	if (keyboardController != NULL && keyboardController->ProcessAxisMotion(event)) {
-		keyboardController->ScaleJoysticks();
-		return true;
-	}
-#endif
+
+	SDL_Log("Simulating SimulateRightStickWithDpad");
+	// If there is no controller associated to the event, we simulate the events with DPAD
 	return SimulateRightStickWithDpad(event, ctrl_event);
 }
 

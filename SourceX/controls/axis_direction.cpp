@@ -6,6 +6,7 @@ namespace dvl {
 
 AxisDirection AxisDirectionRepeater::Get(AxisDirection axis_direction)
 {
+	SDL_Log("AxisDirectionRepeater::Get");
 	const int now = SDL_GetTicks();
 	switch (axis_direction.x) {
 		case AxisDirectionX_LEFT:

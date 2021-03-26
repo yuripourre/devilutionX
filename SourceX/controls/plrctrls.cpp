@@ -872,9 +872,9 @@ void ProcessLeftStickOrDPadGameUI() {
 		handler(Controller::GetLeftStickOrDpadDirection(true));
 }
 
-void Movement()
+void Movement(int pnum)
 {
-	if (InGameMenu(myplr)
+	if (InGameMenu(pnum)
 	    || Controller::IsControllerButtonPressed(ControllerButton_BUTTON_START)
 	    || Controller::IsControllerButtonPressed(ControllerButton_BUTTON_BACK))
 		return;
@@ -885,7 +885,7 @@ void Movement()
 	}
 
 	if (GetLeftStickOrDPadGameUIHandler() == NULL) {
-		WalkInDir(myplr, move_dir);
+		WalkInDir(pnum, move_dir);
 	}
 }
 
@@ -1073,7 +1073,9 @@ void plrctrls_every_frame()
 void plrctrls_after_game_logic()
 {
 	// TODO! For each local player
-	Movement();
+	for (int pnum = 0; pnum < MAX_PLRS; pnum++) {
+		Movement(pnum);
+	}
 }
 
 void UseBeltItem(int pnum, int type)
