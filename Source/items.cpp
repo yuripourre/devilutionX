@@ -526,7 +526,9 @@ int items_get_currlevel()
 	if (currlevel >= 21 && currlevel <= 24)
 		lvl = currlevel - 7;
 
-	return lvl;
+	// CHEAT
+	//return lvl;
+	return 13;
 }
 
 void InitItemGFX()
@@ -1212,6 +1214,7 @@ void CalcPlrBookVals(int p)
 		for (i = 1; !witchitem[i].isEmpty(); i++) {
 			WitchBookLevel(i);
 			witchitem[i]._iStatFlag = StoreStatOk(&witchitem[i]);
+			witchitem[i]._iIvalue *= 0.001;
 		}
 	}
 
@@ -1868,11 +1871,11 @@ void GetItemAttrs(int i, int idata, int lvl)
 
 	int rndv;
 	int itemlevel = items_get_currlevel();
-	if (gnDifficulty == DIFF_NORMAL)
+	/*if (gnDifficulty == DIFF_NORMAL)
 		rndv = 5 * itemlevel + random_(21, 10 * itemlevel);
 	else if (gnDifficulty == DIFF_NIGHTMARE)
 		rndv = 5 * (itemlevel + 16) + random_(21, 10 * (itemlevel + 16));
-	else if (gnDifficulty == DIFF_HELL)
+	else if (gnDifficulty == DIFF_HELL)*/
 		rndv = 5 * (itemlevel + 32) + random_(21, 10 * (itemlevel + 32));
 	if (leveltype == DTYPE_HELL)
 		rndv += rndv >> 3;
@@ -2479,10 +2482,10 @@ int RndItem(int m)
 	if (monster[m].MData->mTreasure & 0x4000)
 		return 0;
 
-	if (random_(24, 100) > 40)
+	/*if (random_(24, 100) > 40)
 		return 0;
 
-	if (random_(24, 100) > 25)
+	if (random_(24, 100) > 25)*/
 		return IDI_GOLD + 1;
 
 	ri = 0;
@@ -2711,6 +2714,9 @@ void SetupAllItems(int ii, int idx, int iseed, int lvl, int uper, BOOL onlygood,
 	GetItemAttrs(ii, idx, lvl >> 1);
 	item[ii]._iCreateInfo = lvl;
 
+	// Always identified
+	item[ii]._iIdentified = TRUE;
+
 	if (pregen)
 		item[ii]._iCreateInfo |= CF_PREGEN;
 	if (onlygood)
@@ -2892,10 +2898,11 @@ void CreateTypeItem(int x, int y, BOOL onlygood, int itype, int imisc, BOOL send
 	int idx;
 
 	int curlv = items_get_currlevel();
-	if (itype != ITYPE_GOLD)
+	/*if (itype != ITYPE_GOLD)
 		idx = RndTypeItems(itype, imisc, curlv);
 	else
-		idx = IDI_GOLD;
+		idx = IDI_GOLD;*/
+	idx = RndTypeItems(itype, imisc, curlv);
 
 	SetupBaseItem(x, y, idx, onlygood, sendmsg, delta);
 }
@@ -4630,11 +4637,11 @@ static void SpawnOnePremium(int i, int plvl, int myplr)
 		GetItemAttrs(0, itype, plvl);
 		GetItemBonus(0, itype, plvl >> 1, plvl, TRUE, !gbIsHellfire);
 
-		if (!gbIsHellfire) {
+		/*if (!gbIsHellfire) {
 			if (item[0]._iIvalue > 140000)
 				continue;
 			break;
-		}
+		}*/
 
 		ivalue = 0;
 		switch (item[0]._itype) {
@@ -4678,12 +4685,17 @@ static void SpawnOnePremium(int i, int plvl, int myplr)
 	             || item[0]._iMinStr > strength
 	             || item[0]._iMinMag > magic
 	             || item[0]._iMinDex > dexterity
+	             // CHEAT Generate rings only
+	             || item[0]._itype != ITYPE_RING
 	             || item[0]._iIvalue < ivalue)
 	    && count < 150);
+
 	premiumitem[i] = item[0];
 	premiumitem[i]._iCreateInfo = plvl | CF_SMITHPREMIUM;
 	premiumitem[i]._iIdentified = TRUE;
 	premiumitem[i]._iStatFlag = StoreStatOk(&premiumitem[i]);
+	premiumitem[i]._iIvalue *= 0.001;
+
 	item[0] = holditem;
 }
 
@@ -4691,8 +4703,12 @@ void SpawnPremium(int pnum)
 {
 	int i;
 
-	int lvl = plr[pnum]._pLevel;
-	int maxItems = gbIsHellfire ? SMITH_PREMIUM_ITEMS : 6;
+	// Add 10 to the level of items
+	int lvl = plr[pnum]._pLevel + 10;
+	if (lvl > 50) {
+		lvl = 50;
+	}
+	int maxItems = SMITH_PREMIUM_ITEMS;
 	if (numpremium < maxItems) {
 		for (i = 0; i < maxItems; i++) {
 			if (premiumitem[i].isEmpty()) {
@@ -4704,7 +4720,8 @@ void SpawnPremium(int pnum)
 	}
 	while (premiumlevel < lvl) {
 		premiumlevel++;
-		if (gbIsHellfire) {
+		//if (gbIsHellfire) {
+		if (!gbIsHellfire) {
 			premiumitem[0] = premiumitem[3];
 			premiumitem[1] = premiumitem[4];
 			premiumitem[2] = premiumitem[5];
@@ -4717,6 +4734,7 @@ void SpawnPremium(int pnum)
 			premiumitem[9] = premiumitem[12];
 			SpawnOnePremium(10, premiumlevel + premiumLvlAddHellfire[10], pnum);
 			premiumitem[11] = premiumitem[13];
+			SpawnOnePremium(11, premiumlevel + premiumLvlAddHellfire[11], pnum);
 			SpawnOnePremium(12, premiumlevel + premiumLvlAddHellfire[12], pnum);
 			premiumitem[13] = premiumitem[14];
 			SpawnOnePremium(14, premiumlevel + premiumLvlAddHellfire[14], pnum);
@@ -4850,7 +4868,7 @@ void SpawnWitch(int lvl)
 		maxValue = 200000;
 
 		int bCnt;
-		int books = random_(3, 4);
+		int books = 2+random_(3, 4);
 		for (i = 114, bCnt = 0; i <= 117 && bCnt < books; ++i) {
 			if (WitchItemOk(i)
 			    && lvl >= AllItemsList[i].iMinMLvl) {
@@ -4863,6 +4881,7 @@ void SpawnWitch(int lvl)
 				witchitem[j] = item[0];
 				witchitem[j]._iCreateInfo = lvl | CF_WITCH;
 				witchitem[j]._iIdentified = TRUE;
+				witchitem[i]._iIvalue *= 0.001;
 				WitchBookLevel(j);
 				witchitem[j]._iStatFlag = StoreStatOk(&witchitem[j]);
 				j++;
@@ -4892,6 +4911,7 @@ void SpawnWitch(int lvl)
 		witchitem[i] = item[0];
 		witchitem[i]._iCreateInfo = lvl | CF_WITCH;
 		witchitem[i]._iIdentified = TRUE;
+		witchitem[i]._iIvalue *= 0.001;
 		WitchBookLevel(i);
 		witchitem[i]._iStatFlag = StoreStatOk(&witchitem[i]);
 	}
@@ -5351,6 +5371,7 @@ static void CreateMagicItem(int x, int y, int lvl, int imisc, int imid, int icur
 
 		idx = RndTypeItems(imisc, imid, lvl);
 	}
+	item[ii]._iIdentified = TRUE;
 	GetSuperItemSpace(x, y, ii);
 
 	if (sendmsg)
@@ -5368,6 +5389,11 @@ void CreateMagicArmor(int x, int y, int imisc, int icurs, BOOL sendmsg, BOOL del
 void CreateAmulet(int x, int y, int lvl, BOOL sendmsg, BOOL delta)
 {
 	CreateMagicItem(x, y, lvl, ITYPE_AMULET, IMISC_AMULET, ICURS_AMULET, sendmsg, delta);
+}
+
+void CreateRing(int x, int y, int lvl, BOOL sendmsg, BOOL delta)
+{
+	CreateMagicItem(x, y, lvl, ITYPE_RING, IMISC_RING, ICURS_RING, sendmsg, delta);
 }
 
 void CreateMagicWeapon(int x, int y, int imisc, int icurs, BOOL sendmsg, BOOL delta)

@@ -726,8 +726,9 @@ BOOL WitchSellOk(int i)
 
 	if (pI->_itype == ITYPE_MISC)
 		rv = TRUE;
-	if (pI->_iMiscId > 29 && pI->_iMiscId < 41)
-		rv = FALSE;
+	// Allow god knows what
+	//if (pI->_iMiscId > 29 && pI->_iMiscId < 41)
+		//rv = FALSE;
 	if (pI->_iClass == ICLASS_QUEST)
 		rv = FALSE;
 	if (pI->_itype == ITYPE_STAFF && (!gbIsHellfire || pI->_iSpell != SPL_NULL))

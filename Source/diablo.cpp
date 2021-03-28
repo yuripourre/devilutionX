@@ -437,7 +437,6 @@ static void SaveOptions()
 	setIniInt("Game", "Test Barbarian", sgOptions.Gameplay.bTestBarbarian);
 	setIniInt("Game", "Experience Bar", sgOptions.Gameplay.bExperienceBar);
 	setIniInt("Game", "Enemy Health Bar", sgOptions.Gameplay.bEnemyHealthBar);
-	setIniInt("Game", "Highlight Items", sgOptions.Gameplay.bHighlightItems);
 	setIniInt("Game", "Auto Gold Pickup", sgOptions.Gameplay.bAutoGoldPickup);
 	setIniInt("Game", "Adria Refills Mana", sgOptions.Gameplay.bAdriaRefillsMana);
 	setIniInt("Game", "Auto Equip Weapons", sgOptions.Gameplay.bAutoEquipWeapons);
@@ -461,8 +460,6 @@ static void SaveOptions()
 #ifdef __vita__
 	setIniInt("Controller", "Enable Rear Touchpad", sgOptions.Controller.bRearTouch);
 #endif
-
-	SaveIni();
 }
 
 /**
@@ -511,7 +508,6 @@ static void LoadOptions()
 	sgOptions.Gameplay.bTestBarbarian = getIniBool("Game", "Test Barbarian", false);
 	sgOptions.Gameplay.bExperienceBar = getIniBool("Game", "Experience Bar", false);
 	sgOptions.Gameplay.bEnemyHealthBar = getIniBool("Game", "Enemy Health Bar", false);
-	sgOptions.Gameplay.bHighlightItems = getIniBool("Game", "Highlight Items", false);
 	sgOptions.Gameplay.bAutoGoldPickup = getIniBool("Game", "Auto Gold Pickup", false);
 	sgOptions.Gameplay.bAdriaRefillsMana = getIniBool("Game", "Adria Refills Mana", false);
 	sgOptions.Gameplay.bAutoEquipWeapons = getIniBool("Game", "Auto Equip Weapons", true);

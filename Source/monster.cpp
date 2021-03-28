@@ -1739,7 +1739,23 @@ void SpawnLoot(int i, BOOL sendmsg)
 		CreateMagicWeapon(Monst->_mx, Monst->_my, ITYPE_BOW, ICURS_LONG_WAR_BOW, FALSE, TRUE);
 		CreateSpellBook(Monst->_mx, Monst->_my, SPL_APOCA, FALSE, TRUE);
 	} else if (i > MAX_PLRS - 1) { // Golems should not spawn loot
-		SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+		// CHEAT
+		// Always drop amulets
+		//SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+		//SpawnUnique(-(i + 1), Monst->_mx, Monst->_my);
+		//if (random_(0, 2) % 2 == 0) {
+			//CreateMagicArmor(Monst->_mx, Monst->_my, ITYPE_HARMOR, ICURS_BREAST_PLATE, FALSE, TRUE);
+			CreateMagicWeapon(Monst->_mx, Monst->_my, ITYPE_STAFF, ICURS_WAR_STAFF, FALSE, TRUE);
+			//CreateAmulet(Monst->_mx, Monst->_my, random_(13, 50), FALSE, TRUE);
+			//CreateRing(Monst->_mx, Monst->_my, random_(13, 50), FALSE, TRUE);
+
+		//CreateMagicWeapon(Monst->_mx, Monst->_my, ITYPE_SWORD, ICURS_GREAT_SWORD, FALSE, TRUE);
+        //CreateMagicWeapon(Monst->_mx, Monst->_my, ITYPE_STAFF, ICURS_WAR_STAFF, FALSE, TRUE);
+        //CreateMagicWeapon(Monst->_mx, Monst->_my, ITYPE_BOW, ICURS_LONG_WAR_BOW, FALSE, TRUE);
+        //CreateSpellBook(Monst->_mx, Monst->_my, SPL_APOCA, FALSE, TRUE);
+	} else {
+		//CreateAmulet(Monst->_mx, Monst->_my, 13, FALSE, TRUE);
+		CreateRing(Monst->_mx, Monst->_my, 13, FALSE, TRUE);
 	}
 }
 

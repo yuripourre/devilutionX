@@ -66,9 +66,9 @@
 
 // todo: enums
 #define NUMLEVELS				25
-#define WITCH_ITEMS				25
+#define WITCH_ITEMS				50
 #define SMITH_ITEMS				25
-#define SMITH_PREMIUM_ITEMS		15
+#define SMITH_PREMIUM_ITEMS		50
 #define STORE_LINES				104
 
 // from diablo 2 beta

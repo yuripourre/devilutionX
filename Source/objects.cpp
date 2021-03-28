@@ -5144,10 +5144,14 @@ void GetObjectStr(int i)
 		strcpy(infostr, "Weapon Rack");
 		break;
 	case OBJ_GOATSHRINE:
-		strcpy(infostr, "Goat Shrine");
+		sprintf(tempstr, "%s Goat Shrine", shrinestrs[object[i]._oVar1]);
+		strcpy(infostr, tempstr);
+		//strcpy(infostr, "Goat Shrine");
 		break;
 	case OBJ_CAULDRON:
-		strcpy(infostr, "Cauldron");
+		sprintf(tempstr, "%s Cauldron", shrinestrs[object[i]._oVar1]);
+		strcpy(infostr, tempstr);
+		//strcpy(infostr, "Cauldron");
 		break;
 	case OBJ_MURKYFTN:
 		strcpy(infostr, "Murky Pool");

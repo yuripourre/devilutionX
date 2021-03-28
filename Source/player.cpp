@@ -894,7 +894,7 @@ void AddPlrExperience(int pnum, int lvl, int exp)
 	// Adjust xp based on difference in level between player and monster
 	exp *= 1 + ((double)lvl - plr[pnum]._pLevel) / 10;
 	if (exp < 0) {
-		exp = 0;
+		exp = 1;
 	}
 
 	// Prevent power leveling
@@ -914,7 +914,8 @@ void AddPlrExperience(int pnum, int lvl, int exp)
 		}
 	}
 
-	plr[pnum]._pExperience += exp;
+	// Each kill is like a thousand
+	plr[pnum]._pExperience += exp * 1200;
 	if ((DWORD)plr[pnum]._pExperience > MAXEXP) {
 		plr[pnum]._pExperience = MAXEXP;
 	}
