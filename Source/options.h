@@ -89,8 +89,10 @@ struct GameplayOptions {
 	bool bAutoEquipJewelry;
 	/** @brief Only enable 2/3 quests in each game sessoin */
 	bool bRandomizeQuests;
-	/** @brief Indicates whether or not mosnter type (Animal, Demon, Undead) is shown along with other monster information. */
+	/** @brief Indicates whether or not monster type (Animal, Demon, Undead) is shown along with other monster information. */
 	bool bShowMonsterType;
+	/** @brief Display Cauldron and Goat Shrines's names. */
+	bool bCauldronShrineNames;
 };
 
 struct ControllerOptions {

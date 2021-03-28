@@ -4,6 +4,7 @@
  * Implementation of object functionality, interaction, spawning, loading, etc.
  */
 #include "all.h"
+#include "options.h"
 
 DEVILUTION_BEGIN_NAMESPACE
 
@@ -1430,12 +1431,58 @@ void AddArmorStand(int i)
 
 void AddGoatShrine(int i)
 {
-	object[i]._oRndSeed = AdvanceRndSeed();
+	if (!sgOptions.Gameplay.bCauldronShrineNames) {
+		object[i]._oRndSeed = AdvanceRndSeed();
+	} else {
+		int val;
+		bool slist[NUM_SHRINETYPE];
+		int j;
+		object[i]._oPreFlag = TRUE;
+
+		int shrines = gbIsHellfire ? NUM_SHRINETYPE : 26;
+
+		for (j = 0; j < shrines; j++) {
+			slist[j] = currlevel >= shrinemin[j] && currlevel <= shrinemax[j];
+			if (gbIsMultiplayer && shrineavail[j] == 1) {
+				slist[j] = false;
+			} else if (!gbIsMultiplayer && shrineavail[j] == 2) {
+				slist[j] = false;
+			}
+		}
+		do {
+			val = random_(150, shrines);
+		} while (!slist[val]);
+
+		object[i]._oVar1 = val;
+	}
 }
 
 void AddCauldron(int i)
 {
-	object[i]._oRndSeed = AdvanceRndSeed();
+	if (!sgOptions.Gameplay.bCauldronShrineNames) {
+		object[i]._oRndSeed = AdvanceRndSeed();
+	} else {
+		int val;
+		bool slist[NUM_SHRINETYPE];
+		int j;
+		object[i]._oPreFlag = TRUE;
+
+		int shrines = gbIsHellfire ? NUM_SHRINETYPE : 26;
+
+		for (j = 0; j < shrines; j++) {
+			slist[j] = currlevel >= shrinemin[j] && currlevel <= shrinemax[j];
+			if (gbIsMultiplayer && shrineavail[j] == 1) {
+				slist[j] = false;
+			} else if (!gbIsMultiplayer && shrineavail[j] == 2) {
+				slist[j] = false;
+			}
+		}
+		do {
+			val = random_(150, shrines);
+		} while (!slist[val]);
+
+		object[i]._oVar1 = val;
+	}
 }
 
 void AddMurkyFountain(int i)
@@ -4227,21 +4274,29 @@ int FindValidShrine(int i)
 
 void OperateGoatShrine(int pnum, int i, int sType)
 {
-	SetRndSeed(object[i]._oRndSeed);
-	object[i]._oVar1 = FindValidShrine(i);
-	OperateShrine(pnum, i, sType);
-	object[i]._oAnimDelay = 2;
-	force_redraw = 255;
+	if (!sgOptions.Gameplay.bCauldronShrineNames) {
+		SetRndSeed(object[i]._oRndSeed);
+		object[i]._oVar1 = FindValidShrine(i);
+		OperateShrine(pnum, i, sType);
+		object[i]._oAnimDelay = 2;
+		force_redraw = 255;
+	} else {
+		OperateShrine(pnum, i, sType);
+	}
 }
 
 void OperateCauldron(int pnum, int i, int sType)
 {
-	SetRndSeed(object[i]._oRndSeed);
-	object[i]._oVar1 = FindValidShrine(i);
-	OperateShrine(pnum, i, sType);
-	object[i]._oAnimFrame = 3;
-	object[i]._oAnimFlag = 0;
-	force_redraw = 255;
+	if (!sgOptions.Gameplay.bCauldronShrineNames) {
+		SetRndSeed(object[i]._oRndSeed);
+		object[i]._oVar1 = FindValidShrine(i);
+		OperateShrine(pnum, i, sType);
+		object[i]._oAnimFrame = 3;
+		object[i]._oAnimFlag = 0;
+		force_redraw = 255;
+	} else {
+		OperateShrine(pnum, i, sType);
+	}
 }
 
 bool OperateFountains(int pnum, int i)
@@ -5144,10 +5199,20 @@ void GetObjectStr(int i)
 		strcpy(infostr, "Weapon Rack");
 		break;
 	case OBJ_GOATSHRINE:
-		strcpy(infostr, "Goat Shrine");
+		if (!sgOptions.Gameplay.bCauldronShrineNames) {
+			strcpy(infostr, "Goat Shrine");
+		} else {
+			sprintf(tempstr, "%s Goat Shrine", shrinestrs[object[i]._oVar1]);
+			strcpy(infostr, tempstr);
+		}
 		break;
 	case OBJ_CAULDRON:
-		strcpy(infostr, "Cauldron");
+		if (!sgOptions.Gameplay.bCauldronShrineNames) {
+			strcpy(infostr, "Cauldron");
+		} else {
+			sprintf(tempstr, "%s Cauldron", shrinestrs[object[i]._oVar1]);
+			strcpy(infostr, tempstr);
+		}
 		break;
 	case OBJ_MURKYFTN:
 		strcpy(infostr, "Murky Pool");
