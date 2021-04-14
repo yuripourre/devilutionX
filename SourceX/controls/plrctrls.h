@@ -5,7 +5,15 @@
 
 #include "all.h"
 
+/*void WalkRight(int playerNumber);
+void WalkLeft(int playerNumber);*/
+
 namespace devilution {
+
+void WalkDown(int playerNumber);
+void WalkLeft(int playerNumber);
+void WalkRight(int playerNumber);
+void WalkUp(int playerNumber);
 
 typedef enum belt_item_type : uint8_t {
 	BLT_HEALING,

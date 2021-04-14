@@ -10,6 +10,40 @@
 
 #define SPLICONLENGTH 56
 
+/*void WalkRight()
+{
+	devilution::AxisDirection AX_RIGHT { devilution::AxisDirectionX_RIGHT, devilution::AxisDirectionY_NONE };
+    WalkOutDir(1, AX_RIGHT);
+}
+
+void WalkLeft()
+{
+	devilution::AxisDirection AX_LEFT { devilution::AxisDirectionX_LEFT, devilution::AxisDirectionY_NONE };
+    WalkOutDir(1, AX_LEFT);
+}
+
+void WalkOutDir(int playerNumber, devilution::AxisDirection dir)
+{
+	const int x = plr[playerNumber]._pfutx;
+	const int y = plr[playerNumber]._pfuty;
+
+	if (dir.x == devilution::AxisDirectionX_NONE && dir.y == devilution::AxisDirectionY_NONE) {
+		if (sgbControllerActive && plr[playerNumber].walkpath[0] != WALK_NONE && plr[playerNumber].destAction == ACTION_NONE)
+			devilution::NetSendCmdLoc(playerNumber, true, CMD_WALKXY, x, y); // Stop walking
+		return;
+	}
+
+	const direction pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
+	const int dx = x + kOffsets[pdir][0];
+	const int dy = y + kOffsets[pdir][1];
+	plr[playerNumber]._pdir = pdir;
+
+	if (PosOkPlayer(playerNumber, dx, dy) && IsPathBlocked(x, y, pdir))
+		return; // Don't start backtrack around obstacles
+
+	devilution::NetSendCmdLoc(playerNumber, true, CMD_WALKXY, dx, dy);
+}*/
+
 namespace devilution {
 
 bool sgbControllerActive = false;
@@ -1246,6 +1280,30 @@ void PerformSecondaryAction()
 		MakePlrPath(myplr, quests[pcursquest]._qtx, quests[pcursquest]._qty, true);
 		plr[myplr].destAction = ACTION_WALK;
 	}
+}
+
+void WalkUp(int pnum)
+{
+	AxisDirection dir { AxisDirectionX_NONE, AxisDirectionY_UP };
+    WalkInDir(pnum, dir);
+}
+
+void WalkDown(int pnum)
+{
+	AxisDirection dir { AxisDirectionX_NONE, AxisDirectionY_DOWN };
+    WalkInDir(pnum, dir);
+}
+
+void WalkRight(int pnum)
+{
+	AxisDirection dir { AxisDirectionX_RIGHT, AxisDirectionY_NONE };
+    WalkInDir(pnum, dir);
+}
+
+void WalkLeft(int pnum)
+{
+	AxisDirection dir { AxisDirectionX_LEFT, AxisDirectionY_NONE };
+    WalkInDir(pnum, dir);
 }
 
 } // namespace devilution

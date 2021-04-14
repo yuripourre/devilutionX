@@ -71,6 +71,7 @@ static void msg_pre_packet()
 				spaceLeft -= sizeof(*cmd);
 				multi_player_left(cmd->bPlr, cmd->dwReason);
 			} else {
+				//TODO PARSE PLAYER number
 				int pktSize = ParseCmd(i, (TCmd *)data);
 				data += pktSize;
 				spaceLeft -= pktSize;
@@ -864,10 +865,11 @@ void NetSendCmdLoc(int playerNumber, bool bHiPri, _cmd_id bCmd, BYTE x, BYTE y)
 	cmd.bCmd = bCmd;
 	cmd.x = x;
 	cmd.y = y;
-	if (bHiPri)
+	if (bHiPri) {
 		NetSendHiPri(playerNumber, (BYTE *)&cmd, sizeof(cmd));
-	else
+	} else {
 		NetSendLoPri(playerNumber, (BYTE *)&cmd, sizeof(cmd));
+	}
 }
 
 void NetSendCmdLocParam1(bool bHiPri, _cmd_id bCmd, BYTE x, BYTE y, WORD wParam1)

@@ -12,6 +12,13 @@
 #include "../DiabloUI/diabloui.h"
 #include <config.h>
 
+// Couch coop
+#include "../SourceX/controls/controller_motion.h"
+#include "../SourceX/controls/game_controls.h"
+#include "../SourceX/controls/controller.h"
+#include "../SourceX/controls/axis_direction.h"
+#include "../SourceX/controls/plrctrls.h"
+
 namespace devilution {
 
 SDL_Window *ghMainWnd;
@@ -90,6 +97,10 @@ bool sbWasOptionsLoaded = false;
 // Controller support:
 extern void plrctrls_every_frame();
 extern void plrctrls_after_game_logic();
+
+// Couch coop testing
+extern void WalkRight();
+extern void WalkLeft();
 
 [[noreturn]] static void print_help_and_exit()
 {
@@ -1016,9 +1027,7 @@ static void PressKey(int vkey)
 		if (vkey == DVL_VK_F11) {
 			diablo_hotkey_msg(2);
 		}
-		if (vkey == DVL_VK_F12) {
-			diablo_hotkey_msg(3);
-		}
+
 		if (vkey == DVL_VK_RETURN) {
 			if (GetAsyncKeyState(DVL_VK_MENU) & 0x8000)
 				dx_reinit();
@@ -1029,6 +1038,23 @@ static void PressKey(int vkey)
 			return;
 		}
 	}
+
+	// Player to be moved
+	int player = 0;
+	//if (vkey == DVL_VK_NUMPAD8) {
+	if (vkey == 'W') {
+		WalkUp(player);
+	}
+	if (vkey == 'S') {
+		WalkDown(player);
+	}
+	if (vkey == 'D') {
+		WalkRight(player);
+	}
+	if (vkey == 'A') {
+		WalkLeft(player);
+	}
+
 	if (vkey == DVL_VK_ESCAPE) {
 		if (!PressEscKey()) {
 			track_repeat_walk(false);
