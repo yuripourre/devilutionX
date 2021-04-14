@@ -800,26 +800,26 @@ bool IsPathBlocked(int x, int y, int dir)
 	return !PosOkPlayer(myplr, d1x, d1y) && !PosOkPlayer(myplr, d2x, d2y);
 }
 
-void WalkInDir(AxisDirection dir)
+void WalkInDir(int playerNumber, AxisDirection dir)
 {
-	const int x = plr[myplr]._pfutx;
-	const int y = plr[myplr]._pfuty;
+	const int x = plr[playerNumber]._pfutx;
+	const int y = plr[playerNumber]._pfuty;
 
 	if (dir.x == AxisDirectionX_NONE && dir.y == AxisDirectionY_NONE) {
-		if (sgbControllerActive && plr[myplr].walkpath[0] != WALK_NONE && plr[myplr].destAction == ACTION_NONE)
-			NetSendCmdLoc(true, CMD_WALKXY, x, y); // Stop walking
+		if (sgbControllerActive && plr[playerNumber].walkpath[0] != WALK_NONE && plr[playerNumber].destAction == ACTION_NONE)
+			NetSendCmdLoc(playerNumber, true, CMD_WALKXY, x, y); // Stop walking
 		return;
 	}
 
 	const direction pdir = kFaceDir[static_cast<std::size_t>(dir.x)][static_cast<std::size_t>(dir.y)];
 	const int dx = x + kOffsets[pdir][0];
 	const int dy = y + kOffsets[pdir][1];
-	plr[myplr]._pdir = pdir;
+	plr[playerNumber]._pdir = pdir;
 
-	if (PosOkPlayer(myplr, dx, dy) && IsPathBlocked(x, y, pdir))
+	if (PosOkPlayer(playerNumber, dx, dy) && IsPathBlocked(x, y, pdir))
 		return; // Don't start backtrack around obstacles
 
-	NetSendCmdLoc(true, CMD_WALKXY, dx, dy);
+	NetSendCmdLoc(playerNumber, true, CMD_WALKXY, dx, dy);
 }
 
 void QuestLogMove(AxisDirection move_dir)
@@ -869,7 +869,7 @@ void ProcessLeftStickOrDPadGameUI()
 		handler(GetLeftStickOrDpadDirection(true));
 }
 
-void Movement()
+void Movement(int playerNumber)
 {
 	if (InGameMenu()
 	    || IsControllerButtonPressed(ControllerButton_BUTTON_START)
@@ -882,7 +882,7 @@ void Movement()
 	}
 
 	if (GetLeftStickOrDPadGameUIHandler() == NULL) {
-		WalkInDir(move_dir);
+		WalkInDir(playerNumber, move_dir);
 	}
 }
 
@@ -1056,7 +1056,7 @@ void plrctrls_every_frame()
 
 void plrctrls_after_game_logic()
 {
-	Movement();
+	Movement(myplr);
 }
 
 void UseBeltItem(int type)
